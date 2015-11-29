@@ -2,8 +2,8 @@
 
 - [Dependencies](#dependencies)
 - [Get data, do QC](#get-data-do-qc)
-- [Prepare reference](prepare-reference)
-- [Call SNPs](call-snps)
+- [Prepare reference](#prepare-reference)
+- [Call SNPs](#call-snps)
 
 
 ## Dependencies

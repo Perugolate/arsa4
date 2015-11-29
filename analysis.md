@@ -1,12 +1,12 @@
 # Table of contents
 
-- [Dependencies]()
-- [Get data, do QC]()
-- [Prepare reference]()
-- [Call SNPs]()
+- [Dependencies](#dependencies)
+- [Get data, do QC](#get-data-do-qc)
+- [Prepare reference](prepare-reference)
+- [Call SNPs](call-snps)
 
 
-# Dependencies
+## Dependencies
 
 * prokka >=1.12-beta (and dependencies)
 * snippy >=2.9
@@ -25,7 +25,7 @@
 source paths
 ```
 
-# Get data, do QC.
+## Get data, do QC
 
 ```bash
 cd $OMDAT
@@ -35,7 +35,7 @@ fastqc *fastq.gz
 mkdir qc && mv *zip qc/ && mv *html qc/
 ```
 
-# Prepare reference.
+## Prepare reference
 
 Re-use 8325-4 reference genome from ARSA3. Three prophages have been excised after Baek et al. 2013.
 ```bash
@@ -68,7 +68,7 @@ snippy-core --prefix control_core *_S*/
 ```
 There are many common SNPs in the controls but none of them are present in every single control strain. 
 
-# Call SNPs
+## Call SNPs
 
 Call SNPs in selected lines.
 ```bash

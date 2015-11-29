@@ -72,10 +72,9 @@ There are many common SNPs in the controls but none of them are present in every
 
 Call SNPs in selected lines.
 ```bash
-cd $OMDAT
-ls *gz | cut -f1-2 -d"_" | sort -u > ../an_b1/list
 cd $ARSA4
-for i in `cat list`
+grep T1 $ARSA4/metadata.csv | cut -f2 -d"," | sed -e 's/$/_S/g' -e 's/^/\^/g' | grep -f - $ARSA4/samples.txt > selected.txt
+for i in `cat selected.txt`
 do
   snippy --cpus 12 --outdir $i --ref sh1000_pol_1.gbk --rgid $i --prefix $i  --pe1 $OMDAT/${i}_L001_R1_001.fastq.gz --pe2 $OMDAT/${i}_L001_R2_001.fastq.gz &> $i.log
 done

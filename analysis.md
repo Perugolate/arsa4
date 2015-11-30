@@ -70,7 +70,7 @@ There are many common SNPs in the controls but none of them are present in every
 
 ## Call SNPs
 
-Call SNPs in selected lines.
+### Call SNPs with `freebayes` using `snippy`
 ```bash
 cd $ARSA4
 grep T1 $ARSA4/metadata.csv | cut -f2 -d"," | sed -e 's/$/_S/g' -e 's/^/\^/g' | grep -f - $ARSA4/samples.txt > selected.txt
@@ -80,4 +80,27 @@ do
 done
 snippy-core --prefix coreAll *_S*/
 ```
+
+### Call variants with `breseq`
+
+`breseq` is slow so use HPC. Template job SLURM file:
+
+```bash
+#! /bin/bash
+#SBATCH --job-name=template_breseq
+#SBATCH --mem=4096
+#SBATCH --cpus-per-task=4
+#SBATCH --time=01:00:00
+cd /scratch/$USER/omdat/
+breseq -r sh1000_pol_1.gbk template_L001_R1_001.fastq template_L001_R2_001.fastq -j 4 -n template -o template
+```
+
+Generate job for each sample.
+```bash
+for i in `cat samples.txt`
+do
+  sed "s/template/$i/g" template.sh > $i.sh
+done
+```
+
 

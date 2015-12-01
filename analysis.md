@@ -4,7 +4,9 @@
 - [Get data, do QC](#get-data-do-qc)
 - [Prepare reference](#prepare-reference)
 - [Call SNPs](#call-snps)
-
+ * [Call SNPs with `freebayes` using `snippy`
+](#call-snps-with-freebayes-using-snippy)
+ * [Call variants with `breseq`](#call-variants-with-breseq)
 
 ## Dependencies
 
@@ -103,4 +105,11 @@ do
 done
 ```
 
+```bash
+mkdir breseq && breseq
+for i in `cat ../samples.txt`
+do
+  scp $SOROBAN:/scratch/$USER/olga90/$i/output/index.html $i.index.html
+done
+```
 

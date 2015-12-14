@@ -1,0 +1,38 @@
+
+```{r}
+library(tidyr) # to split line
+library(magrittr) # for %>%
+library(visreg) # for plotting models
+library(multcomp) # for contrasts
+library(dplyr) # for summaries to plot
+library(plotrix) # for se function
+library(cowplot) # ggplot wrapper
+library(RSvgDevice)
+df1 <- read.csv("o90.csv", skip=11) # skip the comment lines
+# line combines multiple factors so separate to get treatment on its own.
+df2 <- separate(df1, line, into=c("treatment", "line", "colony"), sep="-", extra="merge")
+# exclude populations - less power to detect variants therefore can't be in the same model as colonies.
+# also cannot fit nesteed model on population - not full rank
+df4 <- subset(df2, colony != "P") %>% droplevels
+# indexing by location...
+df5 <- data.frame(df4$treatment, df4$line, rowSums(df4[,5:36])) %>% droplevels
+colnames(df5) <- c("treatment", "line", "mutations")
+#df5$treatment <- relevel(df5$treatment, ref = "WT") # not needed - renamed "WT" to "con"
+# note, replace this with a nested model
+lm(mutations~treatment/line, data=df5) %>% summary
+lm(mutations~treatment/line, data=df5) %>% visreg
+# contrast T1 with T1T2
+K <- matrix(c(0,1,-1, rep(0, 12)),1)
+glht(lm(mutations~treatment/line, data=df5), linfct=K) %>% summary
+# sample sizes
+table(paste(df5$treatment, df5$line))
+df6 <- group_by(df5, treatment)
+df6p <- summarise(df6, m_mu=mean(mutations), se=std.error(mutations))
+# plot mutations by treatment
+ggplot(df6p, aes(x=treatment, y=m_mu)) + geom_point(size=5) + geom_errorbar(aes(ymin=m_mu-se, ymax=m_mu+se), width=0.2) + ylab("# mutations")
+dev.off()
+svg("mu_by_tre.svg")
+ggplot(df6p, aes(x=treatment, y=m_mu)) + geom_point(size=5) + geom_errorbar(aes(ymin=m_mu-se, ymax=m_mu+se), wid
+th=0.2) + ylab("# mutations")
+dev.off()
+```

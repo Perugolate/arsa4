@@ -7,7 +7,6 @@ library(multcomp) # for contrasts
 library(dplyr) # for summaries to plot
 library(plotrix) # for se function
 library(cowplot) # ggplot wrapper
-library(RSvgDevice)
 df1 <- read.csv("o90.csv", skip=11) # skip the comment lines
 # line combines multiple factors so separate to get treatment on its own.
 df2 <- separate(df1, line, into=c("treatment", "line", "colony"), sep="-", extra="merge")
@@ -29,10 +28,7 @@ table(paste(df5$treatment, df5$line))
 df6 <- group_by(df5, treatment)
 df6p <- summarise(df6, m_mu=mean(mutations), se=std.error(mutations))
 # plot mutations by treatment
-ggplot(df6p, aes(x=treatment, y=m_mu)) + geom_point(size=5) + geom_errorbar(aes(ymin=m_mu-se, ymax=m_mu+se), width=0.2) + ylab("# mutations")
-dev.off()
 svg("mu_by_tre.svg")
-ggplot(df6p, aes(x=treatment, y=m_mu)) + geom_point(size=5) + geom_errorbar(aes(ymin=m_mu-se, ymax=m_mu+se), wid
-th=0.2) + ylab("# mutations")
+ggplot(df6p, aes(x=treatment, y=m_mu)) + geom_point(size=5) + geom_errorbar(aes(ymin=m_mu-se, ymax=m_mu+se), width=0.2) + ylab("# mutations")
 dev.off()
 ```

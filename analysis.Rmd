@@ -7,7 +7,6 @@ library(multcomp) # for contrasts
 library(dplyr) # for summaries to plot
 library(plotrix) # for se function
 library(cowplot) # ggplot wrapper
-library(RSvgDevice)
 df1 <- read.csv("o90.csv", skip=11) # skip the comment lines
 # line combines multiple factors so separate to get treatment on its own.
 df2 <- separate(df1, line, into=c("treatment", "line", "colony"), sep="-", extra="merge")
@@ -27,12 +26,29 @@ glht(lm(mutations~treatment/line, data=df5), linfct=K) %>% summary
 # sample sizes
 table(paste(df5$treatment, df5$line))
 df6 <- group_by(df5, treatment)
-df6p <- summarise(df6, m_mu=mean(mutations), se=std.error(mutations))
+df6p <- summarise(df6, m_mu=mean(mutations), ci=1.96*std.error(mutations))
 # plot mutations by treatment
-ggplot(df6p, aes(x=treatment, y=m_mu)) + geom_point(size=5) + geom_errorbar(aes(ymin=m_mu-se, ymax=m_mu+se), width=0.2) + ylab("# mutations")
-dev.off()
-svg("mu_by_tre.svg")
-ggplot(df6p, aes(x=treatment, y=m_mu)) + geom_point(size=5) + geom_errorbar(aes(ymin=m_mu-se, ymax=m_mu+se), wid
-th=0.2) + ylab("# mutations")
+ggplot(df6p, aes(x=treatment, y=m_mu)) + geom_point(size=5) + geom_errorbar(aes(ymin=m_mu-ci, ymax=m_mu+ci), width=0.2) + ylab("# mutations")
 dev.off()
 ```
+
+```{r, eval=FALSE}
+svg("mu_by_tre.svg")
+ggplot(df6p, aes(x=treatment, y=m_mu)) + geom_point(size=5) + geom_errorbar(aes(ymin=m_mu-ci, ymax=m_mu+ci), width=0.2) + ylab("# mutations")
+dev.off()
+```
+
+
+```{r}
+rsvt <- gather(res_rld, stage, expression, -gene)
+```
+
+need to look at 172 mutations in 62 strains and then add cnvs
+```{r}
+filter(df2, colony!="P") %>% droplevels %>% select(-ywtF.877del, -vraS) %>% gather(gene, mutation, -treatment, -line, -colony, -ID) %>% filter(mutation==1) %>% nrow
+filter(df2, colony!="P") %>% droplevels %>% select(-ywtF.877del, -vraS) %>% gather(gene, mutation, -treatment, -line, -colony, -ID) %>% filter(mutation==1) %>% select(ID) %>% unique %>% nrow
+```
+
+
+```{r}
+# more pca testing

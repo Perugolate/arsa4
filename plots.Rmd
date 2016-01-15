@@ -1,0 +1,18 @@
+
+```{r}
+library(readr)
+library(magrittr) # for %>%
+library(dplyr) # for summaries to plot
+library(plotrix) # for se function
+library(cowplot) # ggplot wrapper
+df1 <- read_csv("masterCol.csv", skip=5)
+# dropping the ancestor - seems irrelevant/distracting
+gdf1 <- dplyr::select(df1, sel, type, vmax, lag, od) %>% group_by(sel, type) %>% summarise(vmaxM=mean(vmax), vmax_ci=1.96*std.error(vmax), lagM=mean(lag), lag_ci=1.96*std.error(lag), odM=mean(od), od_ci=1.96*std.error(od)) %>% filter(sel!="ancestor")
+# the dodge is very hacky
+p_vmax <- ggplot(gdf1, aes(x=sel, y=vmaxM, color=type, group=type, ymax=3, ymin=1)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=vmaxM-vmax_ci, ymax=vmaxM+vmax_ci), width=0.2, position=position_dodge(width = .5)) + ylab("vmax") + xlab("selection") + scale_color_discrete(guide=FALSE)
+p_lag <- ggplot(gdf1, aes(x=sel, y=lagM, color=type, group=type)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=lagM-lag_ci, ymax=lagM+lag_ci), width=0.2, position=position_dodge(width = .5)) + ylab("lag (min)") + xlab("selection") + scale_color_discrete(guide=FALSE)
+p_od <- ggplot(gdf1, aes(x=sel, y=odM, color=type, group=type)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=odM-od_ci, ymax=odM+od_ci), width=0.2, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection") + theme(legend.justification=c(1,0), legend.position=c(1,0))
+svg("growth_parameters.svg", width=12, height=4)
+plot_grid(p_vmax, p_lag, p_od, labels = c("A", "B", "C"), align = "h", ncol=3)
+dev.off()
+```

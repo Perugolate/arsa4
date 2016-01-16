@@ -1,3 +1,4 @@
+*Tidy this up with a plot function*
 
 ```{r}
 library(readr)
@@ -5,7 +6,12 @@ library(magrittr)
 library(dplyr)
 library(plotrix)
 library(cowplot)
+```
 
+# Growth parameters
+
+## All data, means with 95% CI
+```{r}
 df1 <- read_csv("masterCol.csv", skip=5)
 # dropping the ancestor - seems irrelevant/distracting.
 gdf1 <- dplyr::select(df1, sel, type, vmax, lag, od) %>% group_by(sel, type) %>% summarise(vmaxM=mean(vmax), vmax_ci=1.96*std.error(vmax), lagM=mean(lag), lag_ci=1.96*std.error(lag), odM=mean(od), od_ci=1.96*std.error(od)) %>% filter(sel!="ancestor")
@@ -18,6 +24,7 @@ p_od1 <- ggplot(gdf1, aes(x=sel, y=odM, color=type, group=type)) + geom_point(si
 #dev.off()
 ```
 
+## Without ID67
 The same but without ID67 (which has some dubious technical replicates - negative vmax etc.).
 ```{r}
 gdf2 <- filter(df1, vmax!=0.375) %>% dplyr::select(sel, type, vmax, lag, od) %>% group_by(sel, type) %>% summarise(vmaxM=mean(vmax), vmax_ci=1.96*std.error(vmax), lagM=mean(lag), lag_ci=1.96*std.error(lag), odM=mean(od), od_ci=1.96*std.error(od)) %>% filter(sel!="ancestor")
@@ -27,16 +34,17 @@ p_od2 <- ggplot(gdf2, aes(x=sel, y=odM, color=type, group=type)) + geom_point(si
 #plot_grid(p_vmax2, p_lag2, p_od2, labels = c("A", "B", "C"), align = "h", ncol=3)
 ```
 
-Plot all points.
+## All data points
 ```{r}
 # drop ancestor or it messes up the final plot.
 df2 <- dplyr::filter(df1, sel!="ancestor")
 p_vmax3 <- ggplot(df2, aes(x=sel, y=vmax, color=as.factor(ID), shape=as.factor(type), group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("vmax") + xlab("selection") + scale_color_discrete(guide=FALSE) + scale_shape_discrete(guide=FALSE)
 p_lag3 <- ggplot(df2, aes(x=sel, y=lag, color=as.factor(ID), shape=as.factor(type), group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("lag (min)") + xlab("selection") + scale_color_discrete(guide=FALSE) + scale_shape_discrete(guide=FALSE)
-p_od3 <- ggplot(df2, aes(x=sel, y=od, color=as.factor(ID), shape=as.factor(type), group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection")  + scale_shape_discrete(guide=FALSE) + scale_color_discrete(guide=FALSE)
+p_od3 <- ggplot(df2, aes(x=sel, y=od, color=as.factor(ID), shape=as.factor(type), group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection") + scale_color_discrete(guide=FALSE) + theme(legend.justification=c(1,0), legend.position=c(1,0))
 #plot_grid(p_vmax1, p_lag1, p_od1, p_vmax3, p_lag3, p_od3, labels = c("A", "B", "C", "D", "E", "F"), align="h", ncol=3)
 ```
 
+## Combine everything
 Everything in 3x3 grid, parameters in columns.
 ```{r}
 svg("gp_outlier.svg", width=12, height=12)
@@ -44,4 +52,26 @@ plot_grid(p_vmax1, p_lag1, p_od1, p_vmax2, p_lag2, p_od2, p_vmax3, p_lag3, p_od3
 dev.off()
 ```
 
+# Cross resistance
 
+## All data, means with 95% CI
+```{r}
+gdf2 <- dplyr::select(df1, sel, type, pex, col, mel, van) %>% group_by(sel, type) %>% summarise(pexM=mean(pex), pex_ci=1.96*std.error(pex), colM=mean(col), col_ci=1.96*std.error(col), melM=mean(mel), mel_ci=1.96*std.error(mel), vanM=mean(van), van_ci=1.96*std.error(van)) %>% filter(sel!="ancestor")
+p_pex1 <- ggplot(gdf2, aes(x=sel, y=pexM, color=type, group=type, ymax=3, ymin=1)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=pexM-pex_ci, ymax=pexM+pex_ci), width=0.2, position=position_dodge(width = .5)) + ylab("pex") + xlab("selection") + scale_color_discrete(guide=FALSE)
+p_col1 <- ggplot(gdf2, aes(x=sel, y=colM, color=type, group=type)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=colM-col_ci, ymax=colM+col_ci), width=0.2, position=position_dodge(width = .5)) + ylab("col (min)") + xlab("selection") + scale_color_discrete(guide=FALSE)
+p_mel1 <- ggplot(gdf2, aes(x=sel, y=melM, color=type, group=type)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=melM-mel_ci, ymax=melM+mel_ci), width=0.2, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection") + scale_color_discrete(guide=FALSE)
+p_van1 <- ggplot(gdf2, aes(x=sel, y=vanM, color=type, group=type)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=vanM-van_ci, ymax=vanM+van_ci), width=0.2, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection") + theme(legend.justification=c(1,0), legend.position="top")
+#plot_grid(p_pex1, p_col1, p_mel1, p_van1, labels = c("pex", "col", "mel", "van"), align="h", ncol=4)
+```
+
+```{r}
+p_pex3 <- ggplot(df2, aes(x=sel, y=pex, color=as.factor(ID), shape=as.factor(type), group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("MIC") + xlab("selection") + scale_color_discrete(guide=FALSE) + scale_shape_discrete(guide=FALSE)
+p_col3 <- ggplot(df2, aes(x=sel, y=col, color=as.factor(ID), shape=as.factor(type), group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("MIC") + xlab("selection") + scale_color_discrete(guide=FALSE) + scale_shape_discrete(guide=FALSE)
+p_mel3 <- ggplot(df2, aes(x=sel, y=mel, color=as.factor(ID), shape=as.factor(type), group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("MIC") + xlab("selection")  + scale_shape_discrete(guide=FALSE) + scale_color_discrete(guide=FALSE)
+p_van3 <- ggplot(df2, aes(x=sel, y=van, color=as.factor(ID), shape=as.factor(type), group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("MIC") + xlab("selection") + scale_color_discrete(guide=FALSE) + theme(legend.justification=c(1,0), legend.position="top")
+#plot_grid(p_pex3, p_col3, p_mel3, p_van3, labels = c("pex", "col", "mel", "van"), align="h", ncol=4)
+```
+
+```{r}
+plot_grid(p_pex1, p_col1, p_mel1, p_van1, p_pex3, p_col3, p_mel3, p_van3, labels = c("pex", "col", "mel", "van", "pex", "col", "mel", "van"), align="h", ncol=4)
+```

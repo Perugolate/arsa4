@@ -2,7 +2,7 @@
 
 Exploratory plots for the growth parameters/cross resistenace data.
 - [Growth parameters in absence of AMPs](#growth-parameters)
- * [~morphotype]()
+ * [~morphotype](#-morphology)
 - [Cross resistance](#cross-resistance)
 - [Growth parameters in presence of AMPs](#growth-under-selection)
 
@@ -65,8 +65,7 @@ df1c <- dplyr::filter(df1, type=="colony")
 gdf1c <- filter(df1c, vmax!=0.375) %>% dplyr::select(sel, morph, vmax, lag, od) %>% group_by(sel, morph) %>% summarise(vmaxM=mean(vmax), vmax_ci=1.96*std.error(vmax), lagM=mean(lag), lag_ci=1.96*std.error(lag), odM=mean(od), od_ci=1.96*std.error(od)) %>% filter(sel!="ancestor")
 p_vmax1c <- ggplot(gdf1c, aes(x=sel, y=vmaxM, color=morph, group=morph, ymax=3, ymin=1)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=vmaxM-vmax_ci, ymax=vmaxM+vmax_ci), width=0.2, position=position_dodge(width = .5)) + ylab("vmax") + xlab("selection") + scale_color_discrete(guide=FALSE)
 p_lag1c <- ggplot(gdf1c, aes(x=sel, y=lagM, color=morph, group=morph)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=lagM-lag_ci, ymax=lagM+lag_ci), width=0.2, position=position_dodge(width = .5)) + ylab("lag (min)") + xlab("selection") + scale_color_discrete(guide=FALSE)
-p_od1c <- ggplot(gdf1c, aes(x=sel, y=odM, color=morph, group=morph)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=odM-od_ci, ymax=odM+od_ci), width=0.2, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection") + theme(legend.justification=c(1,0), legend.position="right")
-plot_grid(p_vmax1c, p_lag1c, p_od1c, labels = c("A", "B", "C"), align = "h", ncol=3)
+p_od1c <- ggplot(gdf1c, aes(x=sel, y=odM, color=morph, group=morph)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=odM-od_ci, ymax=odM+od_ci), width=0.2, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection") + theme(legend.justification=c(1,1), legend.position=c(1,1))
 ```
 
 ### all points
@@ -74,11 +73,11 @@ plot_grid(p_vmax1c, p_lag1c, p_od1c, labels = c("A", "B", "C"), align = "h", nco
 df2c <- dplyr::filter(df1c, sel!="ancestor", ID!=67)
 p_vmax3c <- ggplot(df2c, aes(x=sel, y=vmax, color=morph, group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("vmax") + xlab("selection") + scale_color_discrete(guide=FALSE)
 p_lag3c <- ggplot(df2c, aes(x=sel, y=lag, color=morph, group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("lag (min)") + xlab("selection") + scale_color_discrete(guide=FALSE)
-p_od3c <- ggplot(df2c, aes(x=sel, y=od, color=morph, group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection") + theme(legend.justification=c(1,0), legend.position="right")
+p_od3c <- ggplot(df2c, aes(x=sel, y=od, color=morph, group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection") + scale_color_discrete(guide=FALSE)
 ```
 
 ```{r}
-svg()
+svg("growth_by_morph.svg", height=9, width=12)
 plot_grid(p_vmax1c, p_lag1c, p_od1c, p_vmax3c, p_lag3c, p_od3c, labels = c("A", "B", "C", "D", "E", "F"), align="h", ncol=3)
 dev.off()
 ```

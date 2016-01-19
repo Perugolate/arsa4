@@ -1,4 +1,10 @@
-*Tidy this up with a plot function*
+*Tidy this up with a plot function?*
+
+Exploratory plots for the growth parameters/cross resistenace data.
+- [Growth parameters in absence of AMPs](#growth-parameters)
+ * [~morphotype]()
+- [Cross resistance](#cross-resistance)
+- [Growth parameters in presence of AMPs](#growth-under-selection)
 
 ```{r}
 library(readr)
@@ -52,6 +58,32 @@ plot_grid(p_vmax1, p_lag1, p_od1, p_vmax2, p_lag2, p_od2, p_vmax3, p_lag3, p_od3
 dev.off()
 ```
 
+## ~ morphology
+### summarized
+```{r}
+df1c <- dplyr::filter(df1, type=="colony")
+gdf1c <- filter(df1c, vmax!=0.375) %>% dplyr::select(sel, morph, vmax, lag, od) %>% group_by(sel, morph) %>% summarise(vmaxM=mean(vmax), vmax_ci=1.96*std.error(vmax), lagM=mean(lag), lag_ci=1.96*std.error(lag), odM=mean(od), od_ci=1.96*std.error(od)) %>% filter(sel!="ancestor")
+p_vmax1c <- ggplot(gdf1c, aes(x=sel, y=vmaxM, color=morph, group=morph, ymax=3, ymin=1)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=vmaxM-vmax_ci, ymax=vmaxM+vmax_ci), width=0.2, position=position_dodge(width = .5)) + ylab("vmax") + xlab("selection") + scale_color_discrete(guide=FALSE)
+p_lag1c <- ggplot(gdf1c, aes(x=sel, y=lagM, color=morph, group=morph)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=lagM-lag_ci, ymax=lagM+lag_ci), width=0.2, position=position_dodge(width = .5)) + ylab("lag (min)") + xlab("selection") + scale_color_discrete(guide=FALSE)
+p_od1c <- ggplot(gdf1c, aes(x=sel, y=odM, color=morph, group=morph)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=odM-od_ci, ymax=odM+od_ci), width=0.2, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection") + theme(legend.justification=c(1,0), legend.position="right")
+plot_grid(p_vmax1c, p_lag1c, p_od1c, labels = c("A", "B", "C"), align = "h", ncol=3)
+```
+
+### all points
+```{r}
+df2c <- dplyr::filter(df1c, sel!="ancestor", ID!=67)
+p_vmax3c <- ggplot(df2c, aes(x=sel, y=vmax, color=morph, group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("vmax") + xlab("selection") + scale_color_discrete(guide=FALSE)
+p_lag3c <- ggplot(df2c, aes(x=sel, y=lag, color=morph, group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("lag (min)") + xlab("selection") + scale_color_discrete(guide=FALSE)
+p_od3c <- ggplot(df2c, aes(x=sel, y=od, color=morph, group=as.factor(ID))) + geom_point(size=5, position=position_dodge(width = .5)) + ylab("max OD") + xlab("selection") + theme(legend.justification=c(1,0), legend.position="right")
+```
+
+```{r}
+svg()
+plot_grid(p_vmax1c, p_lag1c, p_od1c, p_vmax3c, p_lag3c, p_od3c, labels = c("A", "B", "C", "D", "E", "F"), align="h", ncol=3)
+dev.off()
+```
+
+
 # Cross resistance
 
 ## All data, means with 95% CI
@@ -74,4 +106,17 @@ p_van3 <- ggplot(df2, aes(x=sel, y=van, color=as.factor(ID), shape=as.factor(typ
 
 ```{r}
 plot_grid(p_pex1, p_col1, p_mel1, p_van1, p_pex3, p_col3, p_mel3, p_van3, labels = c("pex", "col", "mel", "van", "pex", "col", "mel", "van"), align="h", ncol=4)
+```
+
+# Growth under selection
+
+```{r}
+# had to remove couple of suspect observations with negative vmax or od==0.
+df3 <- read_csv("masterPopGSel.csv", skip=2) %>% dplyr::filter(vmax > 0, lag > 0, od > 0)
+gs_vmax <- ggplot(df3, aes(x=day, y=vmax, color=selection,  group=selection)) + geom_point(size=3) + facet_wrap(~line, ncol=5) + geom_line(size=1) + ylab(expression(V["max"])) + xlab("")
+gs_lagt <- ggplot(df3, aes(x=day, y=lag, color=selection,  group=selection)) + geom_point(size=3) + facet_wrap(~line, ncol=5) + geom_line(size=1) + ylab("Lag (days)") + xlab("")
+gs_mxod <- ggplot(df3, aes(x=day, y=od, color=selection,  group=selection)) + geom_point(size=3) + facet_wrap(~line, ncol=5) + geom_line(size=1) + ylab("Max OD") + xlab("Day")
+svg("growth_pop_sel.svg", height=9, width=12) 
+plot_grid(gs_vmax, gs_lagt, gs_mxod, align="h", ncol=1)
+dev.off()
 ```

@@ -80,4 +80,5 @@ dev.off()
 # cannot remember why I was excluding thee two mutations from the count
 filter(df2, colony!="P") %>% droplevels %>% select(-ywtF.877del, -vraS) %>% gather(gene, mutation, -treatment, -line, -colony, -ID) %>% filter(mutation==1) %>% nrow
 filter(df2, colony!="P") %>% droplevels %>% select(-ywtF.877del, -vraS) %>% gather(gene, mutation, -treatment, -line, -colony, -ID) %>% filter(mutation==1) %>% select(ID) %>% unique %>% nrow
+dplyr::filter(df2, colony!="P") %>% dplyr::select(ID, treatment, ytrA, ytrB, graS, graR) %>% group_by(ID, treatment) %>% summarize(count = sum(ytrA, ytrB, graS, graR)) %>% dplyr::filter(treatment=="T1T2" | treatment=="T1") %>% as.data.frame
 ```

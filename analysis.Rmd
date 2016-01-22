@@ -57,8 +57,8 @@ dev.off()
 ```{r}
 mf1 <- read_csv("masterCol.csv", skip=5)
 mf2 <- subset(mf1, type != "population") %>% droplevels
-mf3 <- merge(dplyr::select(mf2, ID, type), df2, by="ID")
-mf4 <- data.frame(mf3$ID, mf3$type, mf3$treatment, mf3$line, mf3$colony, rowSums(dplyr::select(mf3, -ID, -type, -treatment, -line, -colony)))
+mf3 <- merge(dplyr::select(mf2, ID, type, morph), df2, by="ID")
+mf4 <- data.frame(dplyr::select(mf3, ID, morph, type, treatment, line, colony), mutations=rowSums(dplyr::select(mf3, -ID, -morph, -type, -treatment, -line, -colony))) %>% filter(treatment!="ANCESTOR") %>% droplevels
 ```
 
 # Populations

@@ -57,8 +57,10 @@ dev.off()
 ```{r}
 mf1 <- read_csv("masterCol.csv", skip=5)
 mf2 <- subset(mf1, type != "population") %>% droplevels
-mf3 <- merge(dplyr::select(mf2, ID, type, morph), df2, by="ID")
-mf4 <- data.frame(dplyr::select(mf3, ID, morph, type, treatment, line, colony), mutations=rowSums(dplyr::select(mf3, -ID, -morph, -type, -treatment, -line, -colony))) %>% filter(treatment!="ANCESTOR") %>% droplevels
+mf3 <- merge(dplyr::select(mf2, ID, morph), df2, by="ID")
+mf4 <- data.frame(dplyr::select(mf3, ID, morph, treatment, line, colony), mutations=rowSums(dplyr::select(mf3, -ID, -morph, -treatment, -line, -colony))) %>% filter(treatment!="ANCESTOR") %>% droplevels
+mf5 <- group_by(mf4, treatment, morph) %>% summarize(m_mu=mean(mutations), ci=1.96*std.error(mutations))
+ggplot(mf5, aes(x=treatment, y=m_mu, color=morph, group=morph, ymax=5, ymin=1)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=m_mu-ci, ymax=m_mu+ci), width=0.2, position=position_dodge(width = .5)) + ylab("# mutations") + xlab("selection")
 ```
 
 # Populations

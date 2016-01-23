@@ -63,6 +63,13 @@ mf5 <- group_by(mf4, treatment, morph) %>% summarize(m_mu=mean(mutations), ci=1.
 ggplot(mf5, aes(x=treatment, y=m_mu, color=morph, group=morph, ymax=5, ymin=1)) + geom_point(size=5, position=position_dodge(width = .5)) + geom_errorbar(aes(ymin=m_mu-ci, ymax=m_mu+ci), width=0.2, position=position_dodge(width = .5)) + ylab("# mutations") + xlab("selection")
 ```
 
+## *ytr*/*gra* mutations
+```{r}
+df7 <- data.frame(dplyr::select(df4, treatment, line), ytr=rowSums(select(df4, ytrA, ytrB)), gra=rowSums(select(df4, graS, graR)))
+df8 <- group_by(df7, treatment) %>% summarize(f_ytr=sum(ytr)/n(), f_gra=sum(gra)/n()) %>% gather(operon, freq, -treatment)
+ggplot(df8, aes(x=treatment, y=freq, fill=operon)) + geom_bar(stat="identity", position="dodge")
+```
+
 # Populations
 ```{r}
 df4p <- subset(df2, colony == "P") %>% droplevels

@@ -70,6 +70,16 @@ df8 <- group_by(df7, treatment) %>% summarize(f_ytr=sum(ytr)/n(), f_gra=sum(gra)
 ggplot(df8, aes(x=treatment, y=freq, fill=operon)) + geom_bar(stat="identity", position="dodge")
 ```
 
+## growth parameters ~ *ytr*
+```{r}
+df9 <- data.frame(dplyr::select(df4, ID, treatment, line), ytr=rowSums(select(df4, ytrA, ytrB)), gra=rowSums(select(df4, graS, graR)))
+mf6 <- merge(df9, select(mf2, ID, morph, pex, col, mel, vmax, lag, od), by="ID") 
+mf6$ytr <- as.factor(mf6$ytr)
+glm(vmax~ytr, data=filter(mf6, treatment!="con")) %>% visreg
+glm(lag~ytr, data=filter(mf6, treatment!="con")) %>% visreg
+glm(od~ytr, data=filter(mf6, treatment!="con")) %>% visreg
+```
+
 # Populations
 ```{r}
 df4p <- subset(df2, colony == "P") %>% droplevels

@@ -24,7 +24,7 @@
 * vcftools (vcf-consensus)
 * snpEff >= 4.1
 
-```bash
+```sh
 source paths
 ```
 
@@ -41,7 +41,7 @@ mkdir qc && mv *zip qc/ && mv *html qc/
 ## Prepare reference
 
 Re-use 8325 reference genome from ARSA3. Three prophages have been excised after Baek et al. 2013.
-```bash
+```sh
 cd $ARSA4
 mkdir ref && cd ref
 cp $CAROZ/jlal513/flat/phage1/no_phi.fna .
@@ -49,7 +49,7 @@ prokka --cpus 12 no_phi.fna --prefix no_phi
 ```
 
 Call SNPs in ancestor and correct reference.
-```bash
+```sh
 cd $ARSA4/ref
 snippy --cpus 12 --outdir 76_S74 --ref no_phi/no_phi.gbk --rgid 76_S74 --prefix 76_S74 --pe1 $OMDAT/76_S74_L001_R1_001.fastq.gz --pe2 $OMDAT/76_S74_L001_R2_001.fastq.gz &> 76_S74.log
 bcftools consensus -f no_phi.fna  76_S74/76_S74.vcf.gz  -o sh1000_pol_1.fna
@@ -59,7 +59,7 @@ prokka --cpus 12 sh1000_pol_1.fna --prefix sh1000_pol_1
 The resultsing polished reference still had some remaining variants. Mostly medium deletions that were not called by `snippy`. These were iteratively identified, manually corrected, and re-checked using `breseq`. The resulting polished reference is `sh1000_pol_6.fna`.
 
 Call SNPs in present in unselected controls.
-```bash
+```sh
 grep -e WT -e G $ARSA4/metadata.csv | cut -f2 -d"," | sed -e 's/$/_S/g' -e 's/^/\^/g' | grep -f - $ARSA4/samples.txt > controls.txt
 for i in `cat controls.txt`
 do
@@ -68,7 +68,7 @@ done
 ```
 
 Determine core SNPs present in all unselected controls.
-```bash
+```sh
 snippy-core --prefix control_core *_S*/
 ```
 This showed that there are no SNPs that are present in every single control strain. There are SNPs which segregate by the biological replicate line.
@@ -76,7 +76,7 @@ This showed that there are no SNPs that are present in every single control stra
 ## Call SNPs
 
 ### Call SNPs with `freebayes` using `snippy`
-```bash
+```sh
 cd $ARSA4
 grep T1 $ARSA4/metadata.csv | cut -f2 -d"," | sed -e 's/$/_S/g' -e 's/^/\^/g' | grep -f - $ARSA4/samples.txt > selected.txt
 for i in `cat selected.txt`
@@ -90,8 +90,8 @@ snippy-core --prefix coreAll *_S*/
 
 `breseq` is slow so use HPC. Template job SLURM file:
 
-```bash
-#! /bin/bash
+```sh
+#! /bin/sh
 #SBATCH --job-name=template_breseq
 #SBATCH --mem=1024
 #SBATCH --cpus-per-task=4
@@ -103,14 +103,14 @@ breseq -r sh1000_pol_6.gbk template_L001_R1_001.fastq template_L001_R2_001.fastq
 Note 20 minutes is cutting it fine but there were no failures.
 
 Generate job for each sample.
-```bash
+```sh
 for i in `cat samples.txt`
 do
   sed "s/template/$i/g" template.sh > $i.sh
 done
 ```
 
-```bash
+```sh
 cd $ARSA4
 mkdir breseq && breseq
 for i in `cat ../samples.txt`
@@ -122,7 +122,7 @@ done
 ## CNV analysis
 
 Prepare alignments.
-```bash
+```sh
 cd $ARSA4
 mkdir cnv && cd cnv
 cp ../ref/sh1000_pol_6/sh1000_pol_6.fna .
@@ -130,7 +130,7 @@ bwa index sh1000_pol_6.fna
 ```
 
 Align reads to reference, sort, and index.
-```bash
+```sh
 for i in `cat ../samples.txt`
 do
   bwa mem -t 12 -R "@RG\tID:${i}\tSM:${i}" sh1000_pol_6.fna $OMDAT/${i}_L001_R1_001.fastq.gz $OMDAT/${i}_L001_R2_001.fastq.gz > $i.sam

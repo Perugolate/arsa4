@@ -30,7 +30,7 @@ source paths
 
 ## Get data, do QC
 
-```bash
+```sh
 cd $OMDAT
 basemount $BASESPACE
 cp $BASESPACE/Projects/2015_29_JR_bacterial_genomes/Samples/*/Files/Data/Intensities/BaseCalls/*fastq.gz .

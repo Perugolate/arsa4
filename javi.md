@@ -5,6 +5,8 @@
  * [Check the design](#check-the-design)
 - [Growth parameters by treatment/line/strain](#growth-parameters-by-treatmentlinestrain)
 - [Effect of mutation on growth](#effect-of-mutation-on-growth)
+ * [Growth parameters by treatment/mutation](#growth-parameters-by-treatmentmutation)
+ * [Model](#model)
 
 # Prep data
 
@@ -147,9 +149,12 @@ Nope. There is even a whole plate with no unselected controls on it. Also, I won
 by_strain <- filter(df2, strain != "BLANK") %>% group_by(strain) %>%
   summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD)) %>%
   separate(strain, into = c("treatment", "line"), remove = FALSE)
-lag <- ggplot(by_strain, aes(x=treatment, y=lag, color=line)) + geom_point(size=5)
-vmax <- ggplot(by_strain, aes(x=treatment, y=vmax, color=line)) + geom_point(size=5)
-final_OD <- ggplot(by_strain, aes(x=treatment, y=final_OD, color=line)) + geom_point(size=5)
+lag <- ggplot(by_strain, aes(x = treatment, y = lag, color = line)) +
+  geom_point(size = 5)
+vmax <- ggplot(by_strain, aes(x = treatment, y = vmax, color = line)) +
+  geom_point(size = 5)
+final_OD <- ggplot(by_strain, aes(x = treatment, y = final_OD, color = line)) +
+  geom_point(size = 5)
 plot_grid(lag, vmax, final_OD, nrow = 1)
 # summarise by ID in order to join with mutation data
 by_id <- filter(df2, strain != "BLANK") %>% group_by(ID) %>%
@@ -165,14 +170,15 @@ This is just a quick and dirty model incorporating the two most frequently mutat
 Combine with previous mutation data and test for effect of ytr/gra mutations on growth rate:
 
 ```r
-odf1 <- read.csv("o90.csv", skip=11) # skip the comment lines
+odf1 <- read.csv("o90.csv", skip = 11) # skip the comment lines
 # line combines multiple factors so separate to get treatment on its own.
-odf2 <- separate(odf1, line, into=c("treatment", "line", "colony"), sep="-", extra="merge")
+odf2 <- separate(odf1, line, into=c("treatment", "line", "colony"), sep = "-",
+  extra = "merge")
 # get rid of the populations since we don't have growth measurements for them
 odf4 <- subset(odf2, colony != "P") %>% droplevels
 # agglomerate mutations for ytrAB, and graRS
 odf7 <- data.frame(dplyr::select(odf4, ID, treatment, line),
-  ytr=rowSums(select(odf4, ytrA, ytrB)), gra=rowSums(select(odf4, graS, graR)))
+  ytr = rowSums(select(odf4, ytrA, ytrB)), gra = rowSums(select(odf4, graS, graR)))
 # join with Javi's growth data
 gro_mu <- left_join(by_id, odf7)
 ## this part is super hacky
@@ -188,14 +194,32 @@ bar$mutation <- gsub("ytr", "none", bar$mutation)
 groMU <- rbind(foo, bar)
 ```
 
+## Growth parameters by treatment/mutation
+
 ```r
-png("plots/growth_by_mu.png", height = 480*0.8, width = 3*(480*0.8))
+png("plots/growth_by_tremu.png", height = 480 * 0.8, width = 3*(480 * 0.8))
+mvmax <- ggplot(groMU, aes(x = treatment, y = vmax, color = mutation)) +
+  geom_point(size = 5, position = position_dodge(width = 0.5))
+mlag <- ggplot(groMU, aes(x = treatment, y = lag, color = mutation)) +
+  geom_point(size = 5, position=position_dodge(width = 0.5))
+mod <- ggplot(groMU, aes(x = treatment, y = final_OD, color = mutation)) +
+  geom_point(size = 5, position=position_dodge(width = 0.5))
+plot_grid(mlag, mvmax, mod, nrow = 1)
+dev.off()
+```
+
+![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tremu.png)
+
+## Model
+
+```r
+png("plots/growth_by_mu.png", height = 480 * 0.8, width = 3 * (480 * 0.8))
 par(mfrow = c(1,3), cex = 1.2)
-glm(vmax~mutation, data=groMU, family = gaussian) %>%
+glm(vmax ~ mutation, data=groMU, family = gaussian) %>%
   visreg(main = "vmax", ylab = "vmax")
-glm(lag~mutation, data=groMU, family = gaussian) %>%
+glm(lag ~ mutation, data=groMU, family = gaussian) %>%
   visreg(main = "lag", ylab = "lag phase (minutes)")
-glm(final_OD~mutation, data=groMU, family = gaussian) %>%
+glm(final_OD ~ mutation, data=groMU, family = gaussian) %>%
   visreg(main = "final OD", ylab = "final OD (600 nm)")
 dev.off()
 ```
@@ -203,7 +227,7 @@ dev.off()
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu.png)
 
 ```r
-glm(vmax~mutation, data=groMU, family = gaussian) %>% summary
+glm(vmax ~ mutation, data = groMU, family = gaussian) %>% summary
 ```
 
 ```

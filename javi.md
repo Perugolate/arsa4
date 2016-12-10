@@ -204,7 +204,7 @@ mlag <- ggplot(groMU, aes(x = treatment, y = lag, color = mutation)) +
   geom_point(size = 5, position=position_dodge(width = 0.5))
 mod <- ggplot(groMU, aes(x = treatment, y = final_OD, color = mutation)) +
   geom_point(size = 5, position=position_dodge(width = 0.5))
-plot_grid(mlag, mvmax, mod, nrow = 1)
+plot_grid(mvmax, mlag, mod, nrow = 1)
 dev.off()
 ```
 

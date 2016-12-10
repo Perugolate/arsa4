@@ -1,3 +1,13 @@
+# Table of contents
+
+- [Prep data](#prep-data)
+ * [Rescue the IDs](#rescue-the-ids)
+ * [Check the design](#check-the-design)
+- [Growth parameters by treatment/line/strain](#growth-parameters-by-treatmentlinestrain)
+- [Effect of mutation on growth](#effect-of-mutation-on-growth)
+
+# Prep data
+
 ```r
 library(readr)
 library(magrittr)
@@ -6,6 +16,7 @@ library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(cowplot)
+library(visreg)
 df1 <- read_csv("javi.csv")
 df1$strain <- df1$line
 df1 <- separate(df1, line, into = c("treatment", "line"))
@@ -29,8 +40,20 @@ df1
 10        WT     1    10    J1   4.1  9300 secs 57.31667    1.096     1 WT 1 C2
 # ... with 1,142 more rows
 ```
+
+## Rescue the IDs
+
+The strain names are formatted differently from the previous data. Rescue them with the unique ID numbers.
+
 ```r
-unique(df1$plate)
+ids <- read_csv("ids_javi_to_olga.csv")
+df2 <- left_join(df1, ids, by = c("strain" = "javi_id"))
+```
+
+## Check the design
+
+```r
+unique(df2$plate)
 ```
 ```
 [1] 1 2 3
@@ -40,11 +63,12 @@ So he ran three plates.
 Which strains did he look at:
 
 ```r
-unique(df1$line) %>% length
+unique(df2$strain)
 ```
+
 ``` 
- [1] "WT1C2"       "WT1C3"       "WT2C3"       "WT3C2"       "WT3C3"
- [6] "WT4C2"       "WT4C3"       "WT5C2"       "WT5C3"       "T1 1 C2 L"
+ [1] "WT 1 C2"     "WT 1 C3"     "WT 2 C3"     "WT 3 C2"     "WT 3 C3"
+ [6] "WT 4 C2"     "WT 4 C3"     "WT 5 C2"     "WT 5 C3"     "T1 1 C2 L"
 [11] "T1 1 C2 S"   "T1 1 C3 L"   "T1 1 C3 S"   "T1 2 C2 L"   "T1 2 C2 S"
 [16] "T1 2 C3 L"   "T1 3 C2"     "T1 3 C2 L"   "T1 3 C2 S"   "T1 3 C3"
 [21] "BLANK"       "T1 3 C3 S"   "WT 1 C"      "WT 2 C"      "WT 3 C"
@@ -57,6 +81,7 @@ unique(df1$line) %>% length
 [56] "T1 3 S C"    "T1T2 3 C"    "T1T2 3 C2"   "T1T2 3 C3"   "T1T2 4 C2 L"
 [61] "T1T2 4 C3 S" "T1T2 5 C3 L" "T1T2 5 S C"  "T1 3 C3 L"
 ```
+
 ```r
 unique(df1$line) %>% length
 ```
@@ -65,108 +90,97 @@ unique(df1$line) %>% length
 [1] 64
 ```
 
-Javi measured 63 strains (plus "BLANK"). I think this is pretty much all of them.
+Javi measured 63 strains (plus "BLANK"). There are three strains missing (T1-2-C3-S, T1-4-C2-S, and T1-4-C2-S).
 
 Did he balance these across plates?:
 
 ```r
-dplyr::filter(df1, plate == 1) %>% select(line) %>% unique %>% as.data.frame
+dplyr::filter(df2, plate == 1) %>% select(strain) %>% table
 ```
 ```
-        line
-1      WT1C2
-2      WT1C3
-3      WT2C3
-4      WT3C2
-5      WT3C3
-6      WT4C2
-7      WT4C3
-8      WT5C2
-9      WT5C3
-10 T1 1 C2 L
-11 T1 1 C2 S
-12 T1 1 C3 L
-13 T1 1 C3 S
-14 T1 2 C2 L
-15 T1 2 C2 S
-16 T1 2 C3 L
-17   T1 3 C2
-18 T1 3 C2 L
-19 T1 3 C2 S
-20   T1 3 C3
-21     BLANK
-22 T1 3 C3 S
+    BLANK T1 1 C2 L T1 1 C2 S T1 1 C3 L T1 1 C3 S T1 2 C2 L T1 2 C2 S T1 2 C3 L
+       48        16        16        16        16        16        16        16
+  T1 3 C2 T1 3 C2 L T1 3 C2 S   T1 3 C3 T1 3 C3 S   WT 1 C2   WT 1 C3   WT 2 C3
+       16        16        16        16        16        16        16        16
+  WT 3 C2   WT 3 C3   WT 4 C2   WT 4 C3   WT 5 C2   WT 5 C3
+       16        16        16        16        16        16
 ```
 ```r
-dplyr::filter(df1, plate == 2) %>% select(line) %>% unique %>% as.data.frame
+dplyr::filter(df2, plate == 2) %>% select(strain) %>% table
 ```
 ```
-        line
-1     WT 1 C
-2     WT 2 C
-3     WT 3 C
-4     WT 4 C
-5     WT 5 C
-6   ANCESTOR
-7    WT 2 C2
-8   T1 1 L C
-9   T1 1 S C
-10  T1 2 L C
-11  T1 2 S C
-12    T1 4 C
-13 T1 4 C2 L
-14 T1 4 C3 L
-15 T1 4 C3 S
-16    T1 5 C
-17   T1 5 C2
-18   T1 5 C3
-19  T1T2 1 C
-20 T1T2 1 C2
-21 T1T2 1 C3
-22     BLANK
+    BLANK T1 1 C2 L T1 1 C2 S T1 1 C3 L T1 1 C3 S T1 2 C2 L T1 2 C2 S T1 2 C3 L
+       48        16        16        16        16        16        16        16
+  T1 3 C2 T1 3 C2 L T1 3 C2 S   T1 3 C3 T1 3 C3 S   WT 1 C2   WT 1 C3   WT 2 C3
+       16        16        16        16        16        16        16        16
+  WT 3 C2   WT 3 C3   WT 4 C2   WT 4 C3   WT 5 C2   WT 5 C3
+       16        16        16        16        16        16
 ```
 ```r
-dplyr::filter(df1, plate == 3) %>% select(line) %>% unique %>% as.data.frame
+dplyr::filter(df2, plate == 3) %>% select(strain) %>% table
 ```
 ```
-          line
-1     T1T2 2 C
-2    T1T2 2 C2
-3    T1T2 2 C3
-4  T1T2 4 C2 S
-5   T1T2 4 C3L
-6   T1T2 4 L C
-7   T1T2 4 S C
-8  T1T2 5 C2 L
-9  T1T2 5 C2 S
-10 T1T2 5 C3 S
-11  T1T2 5 L C
-12    T1 3 L C
-13    T1 3 S C
-14    T1T2 3 C
-15   T1T2 3 C2
-16   T1T2 3 C3
-17 T1T2 4 C2 L
-18 T1T2 4 C3 S
-19 T1T2 5 C3 L
-20  T1T2 5 S C
-21   T1 3 C3 L
-22       BLANK
+      BLANK   T1 3 C3 L    T1 3 L C    T1 3 S C    T1T2 2 C   T1T2 2 C2
+         48          16          16          16          16          16
+  T1T2 2 C3    T1T2 3 C   T1T2 3 C2   T1T2 3 C3 T1T2 4 C2 L T1T2 4 C2 S
+         16          16          16          16          16          16
+ T1T2 4 C3L T1T2 4 C3 S  T1T2 4 L C  T1T2 4 S C T1T2 5 C2 L T1T2 5 C2 S
+         16          16          16          16          16          16
+T1T2 5 C3 L T1T2 5 C3 S  T1T2 5 L C  T1T2 5 S C
+         16          16          16          16
 ```
 
-Did he fuck. He even ran a whole plate with no unselected controls on it. Also, I wonder if these are pseudo replicates ...
+Nope. There is even a whole plate with no unselected controls on it. Also, I wonder if these 16 replicates are pseudo replicates ...
 
-Parameters by treatment within line
-
+# Growth parameters by treatment/line/strain
 
 ```r
-tre_line <- filter(df1, strain != "BLANK" & strain != "ANCESTOR") %>% group_by(treatment, line) %>% summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD))
-```
-```r
-by_strain <- filter(df1, strain != "BLANK") %>% group_by(strain) %>% summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD)) %>% separate(strain, into = c("treatment", "line"), remove = FALSE)
+by_strain <- filter(df2, strain != "BLANK") %>% group_by(strain) %>% summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD)) %>% separate(strain, into = c("treatment", "line"), remove = FALSE)
 lag <- ggplot(by_strain, aes(x=treatment, y=lag, color=line)) + geom_point(size=5)
 vmax <- ggplot(by_strain, aes(x=treatment, y=vmax, color=line)) + geom_point(size=5)
 final_OD <- ggplot(by_strain, aes(x=treatment, y=final_OD, color=line)) + geom_point(size=5)
 plot_grid(lag, vmax, final_OD, nrow = 1)
+# the following should be fine for joining with the mutation data
+by_id <- filter(df2, strain != "BLANK") %>% group_by(ID) %>% summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD))
 ```
 
+![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_strains.png)
+
+# Effect of mutation on growth
+
+This is just a quick and dirty model incorporating the two most frequently mutated operons (ytr and gra). i.e. agglomerating at the operon level - I will fit a proper model at some point. Perhaps something like `vmax ~ ytrA + ytrB + graR + graS + vraS + tcaA ...` where each variable is a factor and the levels are the genotypes.
+
+Combine with previous mutation data and test for effect of ytr/gra mutations on growth rate:
+
+```r
+odf1 <- read.csv("o90.csv", skip=11) # skip the comment lines
+# line combines multiple factors so separate to get treatment on its own.
+odf2 <- separate(odf1, line, into=c("treatment", "line", "colony"), sep="-", extra="merge")
+# get rid of the populations since we don't have growth measurements for them
+odf4 <- subset(odf2, colony != "P") %>% droplevels
+# agglomerate mutations for ytrAB, and graRS
+odf7 <- data.frame(dplyr::select(odf4, ID, treatment, line), ytr=rowSums(select(odf4, ytrA, ytrB)), gra=rowSums(select(odf4, graS, graR)))
+# join with Javi's growth data
+gro_mu <- left_join(by_id, odf7)
+## this part is super hacky
+# gather into long
+gro_mu_l <- gather(gro_mu, key = mutation, value = presence, ytr, gra)
+# keep the strains which have a mutation
+foo <- dplyr::filter(gro_mu_l, presence == 1)
+# create an object with only the controls
+bar <- filter(gro_mu_l, treatment == "con" & mutation == "ytr")
+# set ehe level to none
+bar$mutation <- gsub("ytr", "none", bar$mutation)
+# combine to make an object with variable "mutation" with values "none", "ytr", and "gra".
+groMU <- rbind(foo, bar)
+```
+```r
+png("growth_by_mu.png", height = 480*0.8, width = 3*(480*0.8))
+par(mfrow = c(1,3))
+glm(vmax~mutation, data=groMU, family = gaussian) %>% visreg(main = "vmax")
+glm(lag~mutation, data=groMU, family = gaussian) %>% visreg(main = "lag")
+glm(final_OD~mutation, data=groMU, family = gaussian) %>% visreg(main = "final OD")
+dev.off()
+```
+
+![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu.png)

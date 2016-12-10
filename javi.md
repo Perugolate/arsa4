@@ -189,11 +189,14 @@ groMU <- rbind(foo, bar)
 ```
 
 ```r
-png("growth_by_mu.png", height = 480*0.8, width = 3*(480*0.8))
-par(mfrow = c(1,3))
-glm(vmax~mutation, data=groMU, family = gaussian) %>% visreg(main = "vmax")
-glm(lag~mutation, data=groMU, family = gaussian) %>% visreg(main = "lag")
-glm(final_OD~mutation, data=groMU, family = gaussian) %>% visreg(main = "final OD")
+png("plots/growth_by_mu.png", height = 480*0.8, width = 3*(480*0.8))
+par(mfrow = c(1,3), cex = 1.2)
+glm(vmax~mutation, data=groMU, family = gaussian) %>%
+  visreg(main = "vmax", ylab = "vmax")
+glm(lag~mutation, data=groMU, family = gaussian) %>%
+  visreg(main = "lag", ylab = "lag phase (minutes)")
+glm(final_OD~mutation, data=groMU, family = gaussian) %>%
+  visreg(main = "final OD", ylab = "final OD (600 nm)")
 dev.off()
 ```
 

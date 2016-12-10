@@ -171,7 +171,8 @@ odf2 <- separate(odf1, line, into=c("treatment", "line", "colony"), sep="-", ext
 # get rid of the populations since we don't have growth measurements for them
 odf4 <- subset(odf2, colony != "P") %>% droplevels
 # agglomerate mutations for ytrAB, and graRS
-odf7 <- data.frame(dplyr::select(odf4, ID, treatment, line), ytr=rowSums(select(odf4, ytrA, ytrB)), gra=rowSums(select(odf4, graS, graR)))
+odf7 <- data.frame(dplyr::select(odf4, ID, treatment, line),
+  ytr=rowSums(select(odf4, ytrA, ytrB)), gra=rowSums(select(odf4, graS, graR)))
 # join with Javi's growth data
 gro_mu <- left_join(by_id, odf7)
 ## this part is super hacky

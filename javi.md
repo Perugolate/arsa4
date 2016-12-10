@@ -7,6 +7,7 @@
 - [Effect of mutation on growth](#effect-of-mutation-on-growth)
  * [Growth parameters by treatment/mutation](#growth-parameters-by-treatmentmutation)
  * [Model](#model)
+  - [`final_OD ~ mutation`](#final_od-mutation) 
 
 # Prep data
 
@@ -226,6 +227,8 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu.png)
 
+### `vmax ~ mutation`
+
 ```r
 glm(vmax ~ mutation, data = groMU, family = gaussian) %>% summary
 ```
@@ -251,6 +254,68 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
     Null deviance: 23.212  on 60  degrees of freedom
 Residual deviance: 10.377  on 58  degrees of freedom
 AIC: 73.062
+
+Number of Fisher Scoring iterations: 2
+```
+
+### `lag ~ mutation`
+
+```r
+glm(lag ~ mutation, data = groMU, family = gaussian) %>% summary
+```
+
+```
+Call:
+glm(formula = lag ~ mutation, family = gaussian, data = groMU)
+
+Deviance Residuals:
+    Min       1Q   Median       3Q      Max
+-59.098  -21.619   -1.197   15.464   81.967
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)   135.966      6.979  19.481  < 2e-16 ***
+mutationnone  -69.539     10.194  -6.822 5.84e-09 ***
+mutationytr     1.202      8.790   0.137    0.892
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for gaussian family taken to be 828.0824)
+
+    Null deviance: 103942  on 60  degrees of freedom
+Residual deviance:  48029  on 58  degrees of freedom
+AIC: 587.9
+
+Number of Fisher Scoring iterations: 2
+```
+
+### `final_OD ~ mutation`
+
+```r
+glm(final_OD ~ mutation, data = groMU, family = gaussian) %>% summary
+```
+
+```
+Call:
+glm(formula = final_OD ~ mutation, family = gaussian, data = groMU)
+
+Deviance Residuals:
+      Min         1Q     Median         3Q        Max
+-0.202439  -0.056064   0.000904   0.050811   0.202923
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)   0.94883    0.01963  48.338  < 2e-16 ***
+mutationnone  0.09027    0.02867   3.149 0.002593 **
+mutationytr   0.10049    0.02472   4.065 0.000147 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for gaussian family taken to be 0.006550187)
+
+    Null deviance: 0.49633  on 60  degrees of freedom
+Residual deviance: 0.37991  on 58  degrees of freedom
+AIC: -128.69
 
 Number of Fisher Scoring iterations: 2
 ```

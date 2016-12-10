@@ -20,10 +20,12 @@ library(visreg)
 df1 <- read_csv("javi.csv")
 df1$strain <- df1$line
 df1 <- separate(df1, line, into = c("treatment", "line"))
+# convert lag time into decimal minutes
 df1$lag <- hms(df1$lag)
 df1$lag <- hour(df1$lag) * 60 + minute(df1$lag) + second(df1$lag) / 60
 df1
 ```
+
 ```
 # A tibble: 1,152 × 10
    treatment  line   rep  well  vmax     t_vmax      lag final_OD plate  strain
@@ -55,9 +57,11 @@ df2 <- left_join(df1, ids, by = c("strain" = "javi_id"))
 ```r
 unique(df2$plate)
 ```
+
 ```
 [1] 1 2 3
 ```
+
 So he ran three plates.
 
 Which strains did he look at:
@@ -92,11 +96,12 @@ unique(df1$line) %>% length
 
 Javi measured 63 strains (plus "BLANK"). There are three strains missing (T1-2-C3-S, T1-4-C2-S, and T1-4-C2-S).
 
-Did he balance these across plates?:
+Is everything balanced across plates?:
 
 ```r
 dplyr::filter(df2, plate == 1) %>% select(strain) %>% table
 ```
+
 ```
     BLANK T1 1 C2 L T1 1 C2 S T1 1 C3 L T1 1 C3 S T1 2 C2 L T1 2 C2 S T1 2 C3 L
        48        16        16        16        16        16        16        16
@@ -105,9 +110,11 @@ dplyr::filter(df2, plate == 1) %>% select(strain) %>% table
   WT 3 C2   WT 3 C3   WT 4 C2   WT 4 C3   WT 5 C2   WT 5 C3
        16        16        16        16        16        16
 ```
+
 ```r
 dplyr::filter(df2, plate == 2) %>% select(strain) %>% table
 ```
+
 ```
     BLANK T1 1 C2 L T1 1 C2 S T1 1 C3 L T1 1 C3 S T1 2 C2 L T1 2 C2 S T1 2 C3 L
        48        16        16        16        16        16        16        16
@@ -116,9 +123,11 @@ dplyr::filter(df2, plate == 2) %>% select(strain) %>% table
   WT 3 C2   WT 3 C3   WT 4 C2   WT 4 C3   WT 5 C2   WT 5 C3
        16        16        16        16        16        16
 ```
+
 ```r
 dplyr::filter(df2, plate == 3) %>% select(strain) %>% table
 ```
+
 ```
       BLANK   T1 3 C3 L    T1 3 L C    T1 3 S C    T1T2 2 C   T1T2 2 C2
          48          16          16          16          16          16
@@ -174,6 +183,7 @@ bar$mutation <- gsub("ytr", "none", bar$mutation)
 # combine to make an object with variable "mutation" with values "none", "ytr", and "gra".
 groMU <- rbind(foo, bar)
 ```
+
 ```r
 png("growth_by_mu.png", height = 480*0.8, width = 3*(480*0.8))
 par(mfrow = c(1,3))
@@ -184,3 +194,32 @@ dev.off()
 ```
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu.png)
+
+```r
+glm(vmax~mutation, data=groMU, family = gaussian) %>% summary
+```
+
+```
+Call:
+glm(formula = vmax ~ mutation, family = gaussian, data = groMU)
+
+Deviance Residuals:
+     Min        1Q    Median        3Q       Max
+-1.09407  -0.16282   0.02333   0.36843   0.75593
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)
+(Intercept)    2.7114     0.1026  26.430  < 2e-16 ***
+mutationnone   1.2340     0.1498   8.236 2.47e-11 ***
+mutationytr    0.3639     0.1292   2.817  0.00662 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for gaussian family taken to be 0.1789134)
+
+    Null deviance: 23.212  on 60  degrees of freedom
+Residual deviance: 10.377  on 58  degrees of freedom
+AIC: 73.062
+
+Number of Fisher Scoring iterations: 2
+```

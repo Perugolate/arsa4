@@ -170,7 +170,7 @@ by_id <- filter(df2, strain != "BLANK") %>% group_by(ID) %>%
 
 # Effect of mutation on growth
 
-These are just quick and dirty models incorporating the two most frequently mutated operons (ytr and gra). i.e. agglomerating at the operon level - I will fit a proper model at some point. Perhaps something like `vmax ~ ytrA + ytrB + graR + graS + vraS + tcaA ...` where each variable is a factor and the levels are the genotypes.
+These are just quick and dirty models incorporating the two most frequently mutated operons (ytr and gra - all resistant strains except one have a mutation in one of these two operons). i.e. agglomerating at the operon level - I will fit a proper model at some point. Perhaps something like `vmax ~ ytrA + ytrB + graR + graS + vraS + tcaA ...` where each variable is a factor and the levels are the genotypes.
 
 Combine with previous mutation data and test for effect of ytr/gra mutations on growth rate:
 

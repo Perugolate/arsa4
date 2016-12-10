@@ -144,13 +144,16 @@ Nope. There is even a whole plate with no unselected controls on it. Also, I won
 # Growth parameters by treatment/line/strain
 
 ```r
-by_strain <- filter(df2, strain != "BLANK") %>% group_by(strain) %>% summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD)) %>% separate(strain, into = c("treatment", "line"), remove = FALSE)
+by_strain <- filter(df2, strain != "BLANK") %>% group_by(strain) %>%
+  summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD)) %>%
+  separate(strain, into = c("treatment", "line"), remove = FALSE)
 lag <- ggplot(by_strain, aes(x=treatment, y=lag, color=line)) + geom_point(size=5)
 vmax <- ggplot(by_strain, aes(x=treatment, y=vmax, color=line)) + geom_point(size=5)
 final_OD <- ggplot(by_strain, aes(x=treatment, y=final_OD, color=line)) + geom_point(size=5)
 plot_grid(lag, vmax, final_OD, nrow = 1)
-# the following should be fine for joining with the mutation data
-by_id <- filter(df2, strain != "BLANK") %>% group_by(ID) %>% summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD))
+# summarise by ID in order to join with mutation data
+by_id <- filter(df2, strain != "BLANK") %>% group_by(ID) %>%
+  summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD))
 ```
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_strains.png)

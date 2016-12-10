@@ -3,11 +3,14 @@
 - [Prep data](#prep-data)
  * [Rescue the IDs](#rescue-the-ids)
  * [Check the design](#check-the-design)
-- [Growth parameters by treatment/line/strain](#growth-parameters-by-treatmentlinestrain)
+ * [Growth parameters by treatment/line/strain](#growth-parameters-by-treatmentlinestrain)
 - [Effect of mutation on growth](#effect-of-mutation-on-growth)
  * [Growth parameters by treatment/mutation](#growth-parameters-by-treatmentmutation)
- * [Model](#model)
-  - [`final_OD ~ mutation`](#final_od-mutation) 
+ * [Models of growth parameters by mutation](#models-of-growth-parameters-by-mutation)
+- [Model summaries](#model-summaries)
+ * [`vmax ~ mutation`](#vmax--mutation) 
+ * [`lag ~ mutation`](#lag--mutation) 
+ * [`final_OD ~ mutation`](#final_od--mutation) 
 
 # Prep data
 
@@ -144,7 +147,7 @@ T1T2 5 C3 L T1T2 5 C3 S  T1T2 5 L C  T1T2 5 S C
 
 Nope. Plate three does not have any unselected controls on it. Treatment T1T2 is also only present on plate three. Also, I wonder if these 16 replicates are pseudo replicates ...
 
-# Growth parameters by treatment/line/strain
+## Growth parameters by treatment/line/strain
 
 ```r
 by_strain <- filter(df2, strain != "BLANK") %>% group_by(strain) %>%
@@ -164,9 +167,10 @@ by_id <- filter(df2, strain != "BLANK") %>% group_by(ID) %>%
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_strains.png)
 
+
 # Effect of mutation on growth
 
-This is just a quick and dirty model incorporating the two most frequently mutated operons (ytr and gra). i.e. agglomerating at the operon level - I will fit a proper model at some point. Perhaps something like `vmax ~ ytrA + ytrB + graR + graS + vraS + tcaA ...` where each variable is a factor and the levels are the genotypes.
+These are just quick and dirty models incorporating the two most frequently mutated operons (ytr and gra). i.e. agglomerating at the operon level - I will fit a proper model at some point. Perhaps something like `vmax ~ ytrA + ytrB + graR + graS + vraS + tcaA ...` where each variable is a factor and the levels are the genotypes.
 
 Combine with previous mutation data and test for effect of ytr/gra mutations on growth rate:
 
@@ -211,7 +215,7 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tremu.png)
 
-## Model
+## Models of growth parameters by mutation
 
 ```r
 png("plots/growth_by_mu.png", height = 480 * 0.8, width = 3 * (480 * 0.8))
@@ -227,7 +231,9 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu.png)
 
-### `vmax ~ mutation`
+# Model summaries
+
+## `vmax ~ mutation`
 
 ```r
 glm(vmax ~ mutation, data = groMU, family = gaussian) %>% summary
@@ -258,7 +264,7 @@ AIC: 73.062
 Number of Fisher Scoring iterations: 2
 ```
 
-### `lag ~ mutation`
+## `lag ~ mutation`
 
 ```r
 glm(lag ~ mutation, data = groMU, family = gaussian) %>% summary
@@ -289,7 +295,7 @@ AIC: 587.9
 Number of Fisher Scoring iterations: 2
 ```
 
-### `final_OD ~ mutation`
+## `final_OD ~ mutation`
 
 ```r
 glm(final_OD ~ mutation, data = groMU, family = gaussian) %>% summary

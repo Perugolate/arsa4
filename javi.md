@@ -64,9 +64,9 @@ unique(df2$plate)
 [1] 1 2 3
 ```
 
-So he ran three plates.
+So there were three plates.
 
-Which strains did he look at:
+Which strains were on the plates:
 
 ```r
 unique(df2$strain)

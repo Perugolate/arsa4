@@ -141,7 +141,7 @@ T1T2 5 C3 L T1T2 5 C3 S  T1T2 5 L C  T1T2 5 S C
          16          16          16          16
 ```
 
-Nope. There is even a whole plate with no unselected controls on it. Also, I wonder if these 16 replicates are pseudo replicates ...
+Nope. Plate three does not have any unselected controls on it. Treatment T1T2 is also only present on plate three. Also, I wonder if these 16 replicates are pseudo replicates ...
 
 # Growth parameters by treatment/line/strain
 

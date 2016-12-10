@@ -66,7 +66,7 @@ unique(df2$plate)
 
 So there were three plates.
 
-Which strains were on the plates:
+Which strains were on the plates?:
 
 ```r
 unique(df2$strain)
@@ -96,7 +96,7 @@ unique(df1$line) %>% length
 [1] 64
 ```
 
-Javi measured 63 strains (plus "BLANK"). There are three strains missing (T1-2-C3-S, T1-4-C2-S, and T1-4-C2-S).
+So 63 strains were measured (plus "BLANK"). There are three strains missing (T1-2-C3-S, T1-4-C2-S, and T1-4-C2-S).
 
 Is everything balanced across plates?:
 

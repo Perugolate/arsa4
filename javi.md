@@ -325,3 +325,17 @@ AIC: -128.69
 
 Number of Fisher Scoring iterations: 2
 ```
+
+## Proper model
+
+```r
+library(vcfR) # install via devtools::install_github(repo="knausb/vcfR")
+library(magrittr)
+library(tidyr)
+library(dplyr)
+tf1 <- read.vcfR("test.vcf") %>% vcfR2tidy
+tf1 <- tf1$gt
+tf2 <- separate(df1, Indiv, into = "ID", extra = "drop") %>% filter(ID != "Reference")
+```
+
+

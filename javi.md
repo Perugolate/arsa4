@@ -336,6 +336,9 @@ library(dplyr)
 tf1 <- read.vcfR("test.vcf") %>% vcfR2tidy
 tf1 <- tf1$gt
 tf2 <- separate(tf1, Indiv, into = "ID", extra = "drop") %>% filter(ID != "Reference")
+# there are no SNPs with more than 1 alternative allele
+# try joining this to summarized growth data - remember ID is chr here
+group_by(tf2, POS, ID) %>% summarize(gt_GT) %>% spread(POS, gt_GT)
 ```
 
 

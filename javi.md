@@ -341,4 +341,26 @@ tf2 <- separate(tf1, Indiv, into = "ID", extra = "drop") %>% filter(ID != "Refer
 group_by(tf2, POS, ID) %>% summarize(gt_GT) %>% spread(POS, gt_GT)
 ```
 
+Some visualizations
+
+```r
+# Find the files.
+vcf_file <- "merged.vcf"
+dna_file <- "sh1000_pol_6.fa"
+gff_file <- "sh1000_pol_6.gff"
+
+# Input the files.
+vcf <- read.vcfR(vcf_file, verbose = FALSE)
+dna <- ape::read.dna(dna_file, format = "fasta")
+gff <- read.table(gff_file, sep="\t", quote="")
+
+# Create a chromR object.
+chrom <- create.chromR(name="Supercontig", vcf=vcf, seq=dna, ann=gff, verbose=TRUE)
+#chrom <- masker(chrom, min_QUAL=0, min_DP=350, max_DP=650, min_MQ=59.5, max_MQ=60.5)
+chrom <- proc.chromR(chrom, verbose = TRUE)
+#chrom <- proc.chromR(chrom, verbose=FALSE, win.size=1e3)
+chromoqc(chrom)
+#plot(chrom)
+extract.gt(chrom, as.numeric = TRUE) %>% heatmap.bp
+```
 

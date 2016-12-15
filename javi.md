@@ -328,6 +328,10 @@ Number of Fisher Scoring iterations: 2
 
 ## Proper model
 
+Need to alter this to work with merged.vcf (test.vcf is derived from `snippy-core` which excludes indels).
+
+Could also check output from `cat merged.vcf | vcf-to-tab > merged.tab`.
+
 ```r
 library(vcfR) # install via devtools::install_github(repo="knausb/vcfR")
 library(magrittr)
@@ -338,14 +342,14 @@ tf1 <- tf1$gt
 tf2 <- separate(tf1, Indiv, into = "ID", extra = "drop") %>% filter(ID != "Reference")
 # there are no SNPs with more than 1 alternative allele
 # try joining this to summarized growth data - remember ID is chr here
-group_by(tf2, POS, ID) %>% summarize(gt_GT) %>% spread(POS, gt_GT)
+select(tf2, POS, ID, gt_GT) %>% group_by(POS, ID) %>% summarize(gt_GT) %>% spread(POS, gt_GT)
 ```
 
 Some visualizations
 
 ```r
 # Find the files.
-vcf_file <- "merged.vcf"
+vcf_file <- "merged.vcf" # derived this from vcf-merge on *.filt.subs.vcf.gz from snippy
 dna_file <- "sh1000_pol_6.fa"
 gff_file <- "sh1000_pol_6.gff"
 

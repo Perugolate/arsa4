@@ -408,7 +408,7 @@ df3 <- select(df2, treatment, ID, line)
 df3$ID <- as.character(df3$ID)
 df4 <- left_join(foo, unique(df3))
 df4 <- select(df4, line, ID, treatment, everything())
-ggplot(df4, aes(x = treatment, y = vmax, color = ytrA_1935579)) +
+ggplot(df4, aes(x = treatment, y = vmax, color = ytrA_1935783)) +
   geom_point(size = 5, position = position_dodge(width = 0.5))
 ```
 `

@@ -93,7 +93,7 @@ unique(df2$strain)
 ```
 
 ```r
-unique(df1$line) %>% length
+unique(df2$strain) %>% length
 ```
 
 ```
@@ -214,6 +214,8 @@ dev.off()
 ```
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tremu.png)
+
+![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tre_box.png)
 
 ## Models of growth parameters by mutation
 

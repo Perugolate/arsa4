@@ -167,6 +167,7 @@ by_id <- filter(df2, strain != "BLANK") %>% group_by(ID) %>%
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_strains.png)
 
+![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tre_box.png)
 
 # Effect of mutation on growth
 
@@ -214,8 +215,6 @@ dev.off()
 ```
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tremu.png)
-
-![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tre_box.png)
 
 ## Models of growth parameters by mutation
 

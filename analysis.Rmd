@@ -61,6 +61,8 @@ ggplot(df6p, aes(x = treatment, y = m_mu)) + geom_point(size = 5) +
 dev.off()
 ```
 
+![](https://github.com/Perugolate/arsa4/blob/master/plots/n_mu_by_tre.png)
+
 ## ~ morphology
 ```{r}
 mf1 <- read_csv("masterCol.csv", skip = 5)

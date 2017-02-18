@@ -232,6 +232,15 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu.png)
 
+```r
+gvmax <- ggplot(groMU, aes(x = mutation, y = vmax, color = treatment)) + 
+  geom_point(size = 5, position = position_jitterdodge())
+glag <- ggplot(groMU, aes(x = mutation, y = lag, color = treatment)) + 
+  geom_point(size = 5, position = position_jitterdodge())
+glod <- ggplot(groMU, aes(x = mutation, y = final_OD, color = treatment)) + 
+  geom_point(size = 5, position = position_jitterdodge())
+plot_grid(gvmax, glag, glod, nrow = 1)
+```
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/grwoth_by_mu_plus_tre.png)
 

@@ -232,6 +232,9 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu.png)
 
+
+![](https://github.com/Perugolate/arsa4/blob/master/plots/grwoth_by_mu_plus_tre.png)
+
 # Model summaries
 
 ## `vmax ~ mutation`

@@ -215,7 +215,7 @@ df3 <- filter(groMU, treatment == "T1" | treatment == "T1T2")
 ggplot(df3, aes(x = factor(mutation))) + geom_bar() + facet_grid(. ~ plate)
 ```
 
-![](https://github.com/Perugolate/arsa4/blob/master/plots/plots/mutation_by_plate.png)
+![](https://github.com/Perugolate/arsa4/blob/master/plots/mutation_by_plate.png)
 
 ## Growth parameters by treatment/mutation
 

@@ -174,7 +174,7 @@ final_OD <- ggplot(by_strain, aes(x = treatment, y = final_OD, color = line)) +
 plot_grid(lag, vmax, final_OD, nrow = 1)
 # summarise by ID in order to join with mutation data
 by_id <- filter(df2, strain != "BLANK") %>% group_by(ID) %>%
-  summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD))
+  summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD), plate = unique(plate))
 ```
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_strains.png)
@@ -210,7 +210,12 @@ bar <- filter(gro_mu_l, treatment == "con" & mutation == "ytr")
 bar$mutation <- gsub("ytr", "none", bar$mutation)
 # combine to make an object with variable "mutation" with values "none", "ytr", and "gra".
 groMU <- rbind(foo, bar)
+# check if mutation is confounded with plate
+df3 <- filter(groMU, treatment == "T1" | treatment == "T1T2")
+ggplot(df3, aes(x = factor(mutation))) + geom_bar() + facet_grid(. ~ plate)
 ```
+
+![](https://github.com/Perugolate/arsa4/blob/master/plots/plots/mutation_by_plate.png)
 
 ## Growth parameters by treatment/mutation
 

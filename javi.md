@@ -147,6 +147,18 @@ T1T2 5 C3 L T1T2 5 C3 S  T1T2 5 L C  T1T2 5 S C
 
 Nope. Plate three does not have any unselected controls on it. Treatment T1T2 is also only present on plate three. Also, I wonder if these 16 replicates are pseudo replicates ...
 
+```r
+ggplot(df2, aes(x = strain, y = vmax, color = line, shape = treatment)) +
+  geom_point(size = 3, alpha = 1) +
+  facet_grid(. ~ plate) + theme(axis.title.x=element_blank(),
+                                axis.text.x=element_blank(),
+                                axis.ticks.x=element_blank())
+```
+
+![](https://github.com/Perugolate/arsa4/blob/master/plots/vmax_by_strain_plate_tre_line.png)
+
+Each column of points is a strain.
+
 ## Growth parameters by treatment/line/strain
 
 ```r

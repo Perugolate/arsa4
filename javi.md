@@ -356,6 +356,19 @@ AIC: -128.69
 Number of Fisher Scoring iterations: 2
 ```
 
+## Growth parameters by treatment
+
+```r
+png("plots/growth_by_tre_box2.png", width = 3*480)
+mvmax <- ggplot(groMU, aes(x = treatment, y = vmax)) + geom_boxplot()
+mlag <- ggplot(groMU, aes(x = treatment, y = lag)) + geom_boxplot()
+mod <- ggplot(groMU, aes(x = treatment, y = final_OD)) + geom_boxplot()
+plot_grid(mvmax, mlag, mod, nrow = 1)
+dev.off()
+```
+
+![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tre_box2.png)
+
 ## Proper model
 
 Need to alter this to work with merged.vcf (test.vcf is derived from `snippy-core` which excludes indels).

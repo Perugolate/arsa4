@@ -23,6 +23,8 @@ library(dplyr)
 library(ggplot2)
 library(cowplot)
 library(visreg)
+library(nlme)
+library(contrast)
 df1 <- read_csv("javi.csv")
 df1$strain <- df1$line
 df1 <- separate(df1, line, into = c("treatment", "line"))

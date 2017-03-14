@@ -322,61 +322,88 @@ lme model parameter contrast
 ```r
 lme(lag ~ mutation, random = ~1|line, data = groMU, method = "REML") %>% summary
 ```
-
 ```
-Call:
-glm(formula = lag ~ mutation, family = gaussian, data = groMU)
+Linear mixed-effects model fit by REML
+ Data: groMU
+       AIC     BIC    logLik
+  550.1268 560.429 -270.0634
 
-Deviance Residuals:
-    Min       1Q   Median       3Q      Max
--59.098  -21.619   -1.197   15.464   81.967
+Random effects:
+ Formula: ~1 | line
+        (Intercept) Residual
+StdDev:    21.05472 21.74158
 
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)
-(Intercept)   135.966      6.979  19.481  < 2e-16 ***
-mutationnone  -69.539     10.194  -6.822 5.84e-09 ***
-mutationytr     1.202      8.790   0.137    0.892
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Fixed effects: lag ~ mutation
+               Value Std.Error DF  t-value p-value
+(Intercept) 66.42632 10.962359 54 6.059491       0
+mutationgra 62.82264  8.738307 54 7.189338       0
+mutationytr 71.26607  7.235584 54 9.849387       0
+ Correlation:
+            (Intr) mttngr
+mutationgra -0.329
+mutationytr -0.397  0.363
 
-(Dispersion parameter for gaussian family taken to be 828.0824)
+Standardized Within-Group Residuals:
+        Min          Q1         Med          Q3         Max
+-2.02508833 -0.54667163 -0.03432731  0.58440504  2.83819265
 
-    Null deviance: 103942  on 60  degrees of freedom
-Residual deviance:  48029  on 58  degrees of freedom
-AIC: 587.9
+Number of Observations: 61
+Number of Groups: 5
+```
 
-Number of Fisher Scoring iterations: 2
+```r
+lag_lme <- lme(lag ~ mutation, random = ~1|line, data = groMU, method = "REML")
+contrast(lag_lme, list(mutation = "gra"), list(mutation = "ytr"))
+```
+```
+lme model parameter contrast
+
+   Contrast     S.E.     Lower   Upper     t df Pr(>|t|)
+1 -8.443423 9.102907 -26.67874 9.79189 -0.93 56   0.3576
 ```
 
 ## `final_OD ~ mutation`
 
 ```r
-glm(final_OD ~ mutation, data = groMU, family = gaussian) %>% summary
+lme(final_OD ~ mutation, random = ~1|line, data = groMU, method = "REML") %>% summary
 ```
-
 ```
-Call:
-glm(formula = final_OD ~ mutation, family = gaussian, data = groMU)
+Linear mixed-effects model fit by REML
+ Data: groMU
+        AIC       BIC   logLik
+  -114.8988 -104.5966 62.44938
 
-Deviance Residuals:
-      Min         1Q     Median         3Q        Max
--0.202439  -0.056064   0.000904   0.050811   0.202923
+Random effects:
+ Formula: ~1 | line
+        (Intercept)   Residual
+StdDev:  0.03919988 0.07280155
 
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)
-(Intercept)   0.94883    0.01963  48.338  < 2e-16 ***
-mutationnone  0.09027    0.02867   3.149 0.002593 **
-mutationytr   0.10049    0.02472   4.065 0.000147 ***
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Fixed effects: final_OD ~ mutation
+                 Value  Std.Error DF  t-value p-value
+(Intercept)  1.0390958 0.02570338 54 40.42642  0.0000
+mutationgra -0.0903432 0.02848323 54 -3.17180  0.0025
+mutationytr  0.0061345 0.02397992 54  0.25582  0.7991
+ Correlation:
+            (Intr) mttngr
+mutationgra -0.483
+mutationytr -0.573  0.410
 
-(Dispersion parameter for gaussian family taken to be 0.006550187)
+Standardized Within-Group Residuals:
+        Min          Q1         Med          Q3         Max
+-2.45948392 -0.62907326 -0.06289563  0.72735393  2.62935481
 
-    Null deviance: 0.49633  on 60  degrees of freedom
-Residual deviance: 0.37991  on 58  degrees of freedom
-AIC: -128.69
+Number of Observations: 61
+Number of Groups: 5
+```
+```r
+fod_lme <- lme(final_OD ~ mutation, random = ~1|line, data = groMU, method = "REML")
+contrast(fod_lme, list(mutation = "gra"), list(mutation = "ytr"))
+```
+```
+lme model parameter contrast
 
-Number of Fisher Scoring iterations: 2
+     Contrast       S.E.      Lower       Upper     t df Pr(>|t|)
+1 -0.09647773 0.02875101 -0.1540729 -0.03888253 -3.36 56   0.0014
 ```
 
 ## Growth parameters by treatment
@@ -392,89 +419,4 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tre_box2.png)
 
-## Proper model
 
-Need to alter this to work with merged.vcf (test.vcf is derived from `snippy-core` which excludes indels).
-
-Could also check output from `cat merged.vcf | vcf-to-tab > merged.tab`.
-
-```r
-library(vcfR) # install via devtools::install_github(repo="knausb/vcfR")
-library(magrittr)
-library(tidyr)
-library(dplyr)
-tf1 <- read.vcfR("test.vcf") %>% vcfR2tidy
-tf1 <- tf1$gt
-tf2 <- separate(tf1, Indiv, into = "ID", extra = "drop") %>% filter(ID != "Reference")
-# there are no SNPs with more than 1 alternative allele
-# try joining this to summarized growth data - remember ID is chr here
-select(tf2, POS, ID, gt_GT) %>% group_by(POS, ID) %>% summarize(gt_GT) %>% spread(POS, gt_GT)
-```
-
-Some visualizations
-
-```r
-# Find the files.
-vcf_file <- "merged.vcf" # derived this from vcf-merge on *.filt.subs.vcf.gz from snippy
-dna_file <- "sh1000_pol_6.fa"
-gff_file <- "sh1000_pol_6.gff"
-
-# Input the files.
-vcf <- read.vcfR(vcf_file, verbose = FALSE)
-dna <- ape::read.dna(dna_file, format = "fasta")
-gff <- read.table(gff_file, sep="\t", quote="")
-
-# Create a chromR object.
-chrom <- create.chromR(name="Supercontig", vcf=vcf, seq=dna, ann=gff, verbose=TRUE)
-#chrom <- masker(chrom, min_QUAL=0, min_DP=350, max_DP=650, min_MQ=59.5, max_MQ=60.5)
-chrom <- proc.chromR(chrom, verbose = TRUE)
-#chrom <- proc.chromR(chrom, verbose=FALSE, win.size=1e3)
-chromoqc(chrom)
-#plot(chrom)
-extract.gt(chrom, as.numeric = TRUE) %>% heatmap.bp
-```
-
-Might try `snpeff` on the merge vcf:
-
-```sh
-mkdir filt && cd filt
-# get all the filtered vcfs from snippy output
-cp ../[0-9]*_S*[0-9]/*_S*filt.subs.vcf.gz* .
-vcf-merge *vcf.gz > merged.vcf
-# add an ANN field describing the predicted snpeff
-~/opt/snippy-3.1/binaries/noarch/snpEff ann -no-downstream -no-upstream -no-intergenic -no-utr -c reference/snpeff.config -dataDir . -noStats ref merged.vcf > eff.vcf
-# convert to tab format (might be easier to wrangle for fitting a model)
-~/opt/snippy-3.1/bin/snippy-vcf_to_tab --gff reference/ref.gff --ref reference/ref.fa --vcf eff.vcf > eff.tab
-```
-
-OK, so the result of the above chunk is that the sample info is stripped from the output of `snippy-vcf_to_tab`. snpeff handles the multi vcf OK so it contains ANN. Need a way of converting it to tab or I just go witht the vcf. Look at code for `snippy-vcf_to_tab` since this drops the columns. Might also be possible to merge the individual tab files.
-
-with `eff.vcf` and `eff.tab`, try using the vcf then joing to the tab to rescue ANN:
-```r
-eff1 <- read.vcfR("eff.vcf")
-eff2 <- vcfR2tidy(eff1)
-eff3 <- eff2$gt
-eff4 <- select(eff3, POS, Indiv, gt_GT_alleles)
-# read in the tabix file to rescue the snpeff annotations
-tab1 <- read_tsv("eff.tab")
-# try combining gene with pos since the intergenic mutations are NA
-tab2 <- unite(tab1, locus, c(GENE, POS), remove = FALSE)
-df7 <- left_join(eff4, tab2)
-df8 <- select(df7, Indiv, locus, gt_GT_alleles)
-df9 <- spread(df8, locus, gt_GT_alleles)
-df9[is.na(df9)] <- "Z"
-df9 <- separate(df9, Indiv, into = c("ID", "sample"))
-# join with by_id and fit a model
-by_id$ID <- as.character(by_id$ID)
-foo <- left_join(by_id, df9)
-```
-
-```r
-df3 <- select(df2, treatment, ID, line)
-df3$ID <- as.character(df3$ID)
-df4 <- left_join(foo, unique(df3))
-df4 <- select(df4, line, ID, treatment, everything())
-ggplot(df4, aes(x = treatment, y = vmax, color = ytrA_1935783)) +
-  geom_point(size = 5, position = position_dodge(width = 0.5))
-```
-`

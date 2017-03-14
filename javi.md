@@ -36,27 +36,6 @@ df2 <- left_join(df1, ids, by = c("strain" = "javi_id"))
 by_strain <- filter(df2, strain != "BLANK") %>% group_by(strain) %>%
   summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD)) %>%
   separate(strain, into = c("treatment", "line"), remove = FALSE)
-```
-
-# Growth parameters by treatment/line/strain
-
-```r
-lag <- ggplot(by_strain, aes(x = treatment, y = lag, color = line)) +
-  geom_point(size = 5)
-vmax <- ggplot(by_strain, aes(x = treatment, y = vmax, color = line)) +
-  geom_point(size = 5)
-final_OD <- ggplot(by_strain, aes(x = treatment, y = final_OD, color = line)) +
-  geom_point(size = 5)
-plot_grid(lag, vmax, final_OD, nrow = 1)
-```
-
-![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_strains.png)
-
-![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tre_box.png)
-
-# Effect of mutation on growth
-
-```r
 # summarise by ID in order to join with mutation data
 by_id <- filter(df2, strain != "BLANK") %>% group_by(ID) %>%
   summarise(vmax = mean(vmax), lag = mean(lag), final_OD = mean(final_OD), plate = unique(plate))
@@ -83,12 +62,20 @@ bar <- filter(gro_mu_l, treatment == "con" & mutation == "ytr")
 bar$mutation <- gsub("ytr", "none", bar$mutation)
 # combine to make an object with variable "mutation" with values "none", "ytr", and "gra".
 groMU <- rbind(foo, bar)
-# check if mutation is confounded with plate
-df3 <- filter(groMU, treatment == "T1" | treatment == "T1T2")
-ggplot(df3, aes(x = factor(mutation))) + geom_bar() + facet_grid(. ~ plate)
 ```
 
-![](https://github.com/Perugolate/arsa4/blob/master/plots/mutation_by_plate.png)
+## Growth parameters by treatment
+
+```r
+png("plots/growth_by_tre_box2.png", width = 3*480)
+mvmax <- ggplot(groMU, aes(x = treatment, y = vmax)) + geom_boxplot()
+mlag <- ggplot(groMU, aes(x = treatment, y = lag)) + geom_boxplot()
+mod <- ggplot(groMU, aes(x = treatment, y = final_OD)) + geom_boxplot()
+plot_grid(mvmax, mlag, mod, nrow = 1)
+dev.off()
+```
+
+![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tre_box2.png)
 
 ## Growth parameters by treatment/mutation
 
@@ -277,16 +264,4 @@ lme model parameter contrast
 1 -0.09647773 0.02875101 -0.1540729 -0.03888253 -3.36 56   0.0014
 ```
 
-## Growth parameters by treatment
-
-```r
-png("plots/growth_by_tre_box2.png", width = 3*480)
-mvmax <- ggplot(groMU, aes(x = treatment, y = vmax)) + geom_boxplot()
-mlag <- ggplot(groMU, aes(x = treatment, y = lag)) + geom_boxplot()
-mod <- ggplot(groMU, aes(x = treatment, y = final_OD)) + geom_boxplot()
-plot_grid(mvmax, mlag, mod, nrow = 1)
-dev.off()
-```
-
-![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tre_box2.png)
 

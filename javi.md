@@ -1,8 +1,6 @@
 # Table of contents
 
 - [Prep data](#prep-data)
-- [Growth parameters by treatment/line/strain](#growth-parameters-by-treatmentlinestrain)
-- [Effect of mutation on growth](#effect-of-mutation-on-growth)
  * [Growth parameters by treatment/mutation](#growth-parameters-by-treatmentmutation)
  * [Models of growth parameters by mutation](#models-of-growth-parameters-by-mutation)
 - [Model summaries](#model-summaries)
@@ -73,7 +71,7 @@ png("plots/growth_by_tre_box2.png", width = 3*480)
 mvmax <- ggplot(groMU, aes(x = treatment, y = vmax)) + geom_boxplot() +
   ylab(expression(V["max"]))
 mlag <- ggplot(groMU, aes(x = treatment, y = lag)) + geom_boxplot() +
-  ylab("lag time (minutes)")
+  ylab("lag phase (minutes)")
 mod <- ggplot(groMU, aes(x = treatment, y = final_OD)) + geom_boxplot() +
   ylab(expression(paste("final ", "OD"["600"], sep = " ")))
 plot_grid(mvmax, mlag, mod, nrow = 1)
@@ -91,7 +89,7 @@ mvmax <- ggplot(groMU, aes(x = treatment, y = vmax, color = mutation)) +
   ylab(expression(V["max"]))
 mlag <- ggplot(groMU, aes(x = treatment, y = lag, color = mutation)) +
   geom_point(size = 5, position=position_dodge(width = 0.5)) +
-  ylab("lag time (minutes)")
+  ylab("lag phase (minutes)")
 mod <- ggplot(groMU, aes(x = treatment, y = final_OD, color = mutation)) +
   geom_point(size = 5, position=position_dodge(width = 0.5)) +
   ylab(expression(paste("final ", "OD"["600"], sep = " ")))
@@ -107,27 +105,28 @@ dev.off()
 png("plots/growth_by_mu.png", height = 480 * 0.8, width = 3 * (480 * 0.8))
 par(mfrow = c(1,3), cex = 1.2)
 glm(vmax ~ mutation, data=groMU, family = gaussian) %>%
-  visreg(main = "vmax", ylab = "vmax")
+  visreg(main = expression(V["max"]), ylab = expression(V["max"]))
 glm(lag ~ mutation, data=groMU, family = gaussian) %>%
-  visreg(main = "lag", ylab = "lag phase (minutes)")
+  visreg(main = "lag phase", ylab = "lag phase (minutes)")
 glm(final_OD ~ mutation, data=groMU, family = gaussian) %>%
-  visreg(main = "final OD", ylab = "final OD (600 nm)")
+  visreg(main = "final OD", ylab = expression(paste("final ", "OD"["600"])))
 dev.off()
 ```
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu.png)
 
 ```r
+png("plots/growth_by_mu_plus_tre.png", height = 480 * 0.8, width = 3*(480 * 0.8))
 gvmax <- ggplot(groMU, aes(x = mutation, y = vmax, color = treatment)) + 
-  geom_point(size = 5, position = position_jitterdodge())
+  geom_point(size = 5, position=position_dodge(width = 0.5))
 glag <- ggplot(groMU, aes(x = mutation, y = lag, color = treatment)) + 
-  geom_point(size = 5, position = position_jitterdodge())
+  geom_point(size = 5, position=position_dodge(width = 0.5))
 glod <- ggplot(groMU, aes(x = mutation, y = final_OD, color = treatment)) + 
-  geom_point(size = 5, position = position_jitterdodge())
+  geom_point(size = 5, position=position_dodge(width = 0.5))
 plot_grid(gvmax, glag, glod, nrow = 1)
 ```
 
-![](https://github.com/Perugolate/arsa4/blob/master/plots/grwoth_by_mu_plus_tre.png)
+![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu_plus_tre.png)
 
 # Model summaries
 

@@ -265,41 +265,62 @@ plot_grid(gvmax, glag, glod, nrow = 1)
 
 # Model summaries
 
+```r
+groMU$mutation <- as.factor(groMU$mutation)
+groMU$mutation <- relevel(groMU$mutation, ref = "none")
+```
+
 ## `vmax ~ mutation`
 
 ```r
-glm(vmax ~ mutation, data = groMU, family = gaussian) %>% summary
+lme(vmax ~ mutation, random = ~1|line, data = groMU, method = "REML") %>% summary
 ```
 
 ```
-Call:
-glm(formula = vmax ~ mutation, family = gaussian, data = groMU)
+Linear mixed-effects model fit by REML
+ Data: groMU
+       AIC     BIC    logLik
+  82.23238 92.5346 -36.11619
 
-Deviance Residuals:
-     Min        1Q    Median        3Q       Max
--1.09407  -0.16282   0.02333   0.36843   0.75593
+Random effects:
+ Formula: ~1 | line
+        (Intercept)  Residual
+StdDev:   0.1338896 0.4070154
 
-Coefficients:
-             Estimate Std. Error t value Pr(>|t|)
-(Intercept)    2.7114     0.1026  26.430  < 2e-16 ***
-mutationnone   1.2340     0.1498   8.236 2.47e-11 ***
-mutationytr    0.3639     0.1292   2.817  0.00662 **
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Fixed effects: vmax ~ mutation
+                Value Std.Error DF  t-value p-value
+(Intercept)  3.945417 0.1209520 54 32.61969       0
+mutationgra -1.255830 0.1539462 54 -8.15759       0
+mutationytr -0.854967 0.1324057 54 -6.45717       0
+ Correlation:
+            (Intr) mttngr
+mutationgra -0.593
+mutationytr -0.690  0.470
 
-(Dispersion parameter for gaussian family taken to be 0.1789134)
+Standardized Within-Group Residuals:
+       Min         Q1        Med         Q3        Max
+-2.5351730 -0.5588148  0.1481167  0.7649218  1.5152300
 
-    Null deviance: 23.212  on 60  degrees of freedom
-Residual deviance: 10.377  on 58  degrees of freedom
-AIC: 73.062
+Number of Observations: 61
+Number of Groups: 5
+```
 
-Number of Fisher Scoring iterations: 2
+```r
+vmax_lme <- lme(vmax ~ mutation, random = ~1|line, data = groMU, method = "REML")
+contrast(vmax_lme, list(mutation = "gra"), list(mutation = "ytr"))
+```
+
+```
+lme model parameter contrast
+
+   Contrast      S.E.     Lower     Upper    t df Pr(>|t|)
+1 -0.400863 0.1485144 -0.698373 -0.103353 -2.7 56   0.0092
 ```
 
 ## `lag ~ mutation`
 
 ```r
-glm(lag ~ mutation, data = groMU, family = gaussian) %>% summary
+lme(lag ~ mutation, random = ~1|line, data = groMU, method = "REML") %>% summary
 ```
 
 ```

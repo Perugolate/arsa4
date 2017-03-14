@@ -1,8 +1,8 @@
 # Table of contents
 
 - [Prep data](#prep-data)
- * [Growth parameters by treatment/mutation](#growth-parameters-by-treatmentmutation)
- * [Models of growth parameters by mutation](#models-of-growth-parameters-by-mutation)
+- [Growth parameters by treatment/mutation](#growth-parameters-by-treatmentmutation)
+- [Models of growth parameters by mutation](#models-of-growth-parameters-by-mutation)
 - [Model summaries](#model-summaries)
  * [`vmax ~ mutation`](#vmax--mutation) 
  * [`lag ~ mutation`](#lag--mutation) 
@@ -124,6 +124,7 @@ glag <- ggplot(groMU, aes(x = mutation, y = lag, color = treatment)) +
 glod <- ggplot(groMU, aes(x = mutation, y = final_OD, color = treatment)) + 
   geom_point(size = 5, position=position_dodge(width = 0.5))
 plot_grid(gvmax, glag, glod, nrow = 1)
+dev.off()
 ```
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu_plus_tre.png)

@@ -62,15 +62,20 @@ bar <- filter(gro_mu_l, treatment == "con" & mutation == "ytr")
 bar$mutation <- gsub("ytr", "none", bar$mutation)
 # combine to make an object with variable "mutation" with values "none", "ytr", and "gra".
 groMU <- rbind(foo, bar)
+groMU$mutation <- as.factor(groMU$mutation)
+groMU$mutation <- relevel(groMU$mutation, ref = "none")
 ```
 
 ## Growth parameters by treatment
 
 ```r
 png("plots/growth_by_tre_box2.png", width = 3*480)
-mvmax <- ggplot(groMU, aes(x = treatment, y = vmax)) + geom_boxplot()
-mlag <- ggplot(groMU, aes(x = treatment, y = lag)) + geom_boxplot()
-mod <- ggplot(groMU, aes(x = treatment, y = final_OD)) + geom_boxplot()
+mvmax <- ggplot(groMU, aes(x = treatment, y = vmax)) + geom_boxplot() +
+  ylab(expression(V["max"]))
+mlag <- ggplot(groMU, aes(x = treatment, y = lag)) + geom_boxplot() +
+  ylab("lag time (minutes)")
+mod <- ggplot(groMU, aes(x = treatment, y = final_OD)) + geom_boxplot() +
+  ylab(expression(paste("final ", "OD"["600"], sep = " ")))
 plot_grid(mvmax, mlag, mod, nrow = 1)
 dev.off()
 ```
@@ -82,11 +87,14 @@ dev.off()
 ```r
 png("plots/growth_by_tremu.png", height = 480 * 0.8, width = 3*(480 * 0.8))
 mvmax <- ggplot(groMU, aes(x = treatment, y = vmax, color = mutation)) +
-  geom_point(size = 5, position = position_dodge(width = 0.5))
+  geom_point(size = 5, position = position_dodge(width = 0.5)) +
+  ylab(expression(V["max"]))
 mlag <- ggplot(groMU, aes(x = treatment, y = lag, color = mutation)) +
-  geom_point(size = 5, position=position_dodge(width = 0.5))
+  geom_point(size = 5, position=position_dodge(width = 0.5)) +
+  ylab("lag time (minutes)")
 mod <- ggplot(groMU, aes(x = treatment, y = final_OD, color = mutation)) +
-  geom_point(size = 5, position=position_dodge(width = 0.5))
+  geom_point(size = 5, position=position_dodge(width = 0.5)) +
+  ylab(expression(paste("final ", "OD"["600"], sep = " ")))
 plot_grid(mvmax, mlag, mod, nrow = 1)
 dev.off()
 ```
@@ -122,11 +130,6 @@ plot_grid(gvmax, glag, glod, nrow = 1)
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/grwoth_by_mu_plus_tre.png)
 
 # Model summaries
-
-```r
-groMU$mutation <- as.factor(groMU$mutation)
-groMU$mutation <- relevel(groMU$mutation, ref = "none")
-```
 
 ## `vmax ~ mutation`
 

@@ -8,7 +8,7 @@
  * [Model summaries](#model-summaries)
 
 # Dependencies
-```{r}
+```r
 library(readr)
 library(tidyr)
 library(magrittr)
@@ -24,7 +24,7 @@ library(lubridate)
 
 # Mutation data
 
-```{R}
+```r
 odf1 <- read.csv("o90.csv", skip = 11) # skip the comment lines
 # line combines multiple factors so separate to get treatment on its own.
 odf2 <- separate(odf1, line, into = c("treatment", "line", "colony"),
@@ -47,7 +47,7 @@ lme model parameter contrast
     Contrast      S.E.      Lower     Upper     t df Pr(>|t|)
 1 -0.1945512 0.2048562 -0.6043247 0.2152222 -0.95 60   0.3461
 ```
-```{r}
+```r
 summary(mixm)
 ```
 ```
@@ -81,7 +81,7 @@ Number of Groups: 5
 
 ## Number of mutations by treatment
 
-```{r}
+```r
 png("plots/n_mu_by_tre.png", width = 2*480)
 gpoint <- ggplot(odf6p, aes(x = treatment, y = m_mu)) + geom_point(size = 5) +
   geom_errorbar(aes(ymin = m_mu - ci, ymax = m_mu + ci), width = 0.2) +
@@ -94,7 +94,7 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/n_mu_by_tre.png)
 
-```{r}
+```r
 png("plots/n_mu_by_tre_line.png")
 lm(mutations ~ treatment/line, data = odf5) %>% visreg("treatment", by = "line")
 dev.off()
@@ -104,7 +104,7 @@ dev.off()
 
 # Growth data
 
-```{r}
+```r
 df1 <- read_csv("javi.csv")
 df1$strain <- df1$line
 df1 <- separate(df1, line, into = c("treatment", "line"))
@@ -144,7 +144,7 @@ groMU$mutation <- relevel(groMU$mutation, ref = "none")
 
 ## Growth parameters by treatment
 
-```{r}
+```r
 png("plots/growth_by_tre_box2.png", width = 3*480)
 mvmax <- ggplot(groMU, aes(x = treatment, y = vmax)) + geom_boxplot() +
   ylab(expression(V["max"]))
@@ -160,7 +160,7 @@ dev.off()
 
 ## Growth parameters by treatment and mutation
 
-```{r}
+```r
 png("plots/growth_by_tremu.png", height = 480 * 0.8, width = 3*(480 * 0.8))
 mvmax <- ggplot(groMU, aes(x = treatment, y = vmax, color = mutation)) +
   geom_point(size = 5, position = position_dodge(width = 0.5)) +
@@ -179,7 +179,7 @@ dev.off()
 
 # Models of growth parameters by mutation
 
-```{r}
+```r
 png("plots/growth_by_mu.png", height = 480 * 0.8, width = 3 * (480 * 0.8))
 par(mfrow = c(1,3), cex = 1.2)
 glm(vmax ~ mutation, data=groMU, family = gaussian) %>%
@@ -193,7 +193,7 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu.png)
 
-```{r}
+```r
 png("plots/growth_by_mu_plus_tre.png", height = 480 * 0.8, width = 3*(480 * 0.8))
 gvmax <- ggplot(groMU, aes(x = mutation, y = vmax, color = treatment)) + 
   geom_point(size = 5, position=position_dodge(width = 0.5)) +
@@ -214,7 +214,7 @@ dev.off()
 
 ### `vmax ~ mutation`
 
-```{r}
+```r
 lme(vmax ~ mutation, random = ~1|line, data = groMU, method = "REML") %>% summary
 ```
 
@@ -247,7 +247,7 @@ Number of Observations: 61
 Number of Groups: 5
 ```
 
-```{r}
+```r
 vmax_lme <- lme(vmax ~ mutation, random = ~1|line, data = groMU, method = "REML")
 contrast(vmax_lme, list(mutation = "gra"), list(mutation = "ytr"))
 ```
@@ -261,7 +261,7 @@ lme model parameter contrast
 
 ### `lag ~ mutation`
 
-```{r}
+```r
 lme(lag ~ mutation, random = ~1|line, data = groMU, method = "REML") %>% summary
 ```
 ```
@@ -293,7 +293,7 @@ Number of Observations: 61
 Number of Groups: 5
 ```
 
-```{r}
+```r
 lag_lme <- lme(lag ~ mutation, random = ~1|line, data = groMU, method = "REML")
 contrast(lag_lme, list(mutation = "gra"), list(mutation = "ytr"))
 ```
@@ -306,7 +306,7 @@ lme model parameter contrast
 
 ### `final_OD ~ mutation`
 
-```{r}
+```r
 lme(final_OD ~ mutation, random = ~1|line, data = groMU, method = "REML") %>% summary
 ```
 ```
@@ -337,7 +337,7 @@ Standardized Within-Group Residuals:
 Number of Observations: 61
 Number of Groups: 5
 ```
-```{r}
+```r
 fod_lme <- lme(final_OD ~ mutation, random = ~1|line, data = groMU, method = "REML")
 contrast(fod_lme, list(mutation = "gra"), list(mutation = "ytr"))
 ```

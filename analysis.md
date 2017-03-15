@@ -1,6 +1,6 @@
 - [Dependencies](#dependencies)
 - [Mutation data](#mutation-data)
-  - [Number of mutations by treatment](number-of-mutations-by-treatment)
+  - [Number of mutations by treatment](#number-of-mutations-by-treatment)
 - [Growth data](#growth-data)
   - [Growth parameters by treatment](#growth-parameters-by-treatment)
   - [Growth parameters by treatment and mutation](#growth-parameters-by-treatment-and-mutation)

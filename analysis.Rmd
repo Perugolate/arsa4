@@ -1,8 +1,11 @@
 - [Dependencies](#dependencies)
-- [Data](#data)
-- [Colonies](#colonies)
-- [Populations](#populations)
-- [Misc.](#misc)
+- [Mutation data](#mutation-data)
+ * [Number of mutations by treatment](number-of-mutations-by-treatment)
+- [Growth data](#growth-data)
+ * [Growth parameters by treatment](#growth-parameters-by-treatment)
+ * [Growth parameters by treatment and mutation](#growth-parameters-by-treatment-and-mutation)
+- [Models of growth parameters by mutation](#models-of-growth-parameters-by-mutation)
+ * [Model summaries](#model-summaries)
 
 # Dependencies
 ```{r}
@@ -19,7 +22,9 @@ library(nlme)
 library(lubridate)
 ```
 
-```{r}
+# Mutation data
+
+```{R}
 odf1 <- read.csv("o90.csv", skip = 11) # skip the comment lines
 # line combines multiple factors so separate to get treatment on its own.
 odf2 <- separate(odf1, line, into = c("treatment", "line", "colony"),
@@ -97,6 +102,8 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/n_mu_by_tre_line.png)
 
+# Growth data
+
 ```{r}
 df1 <- read_csv("javi.csv")
 df1$strain <- df1$line
@@ -151,7 +158,7 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tre_box2.png)
 
-## Growth parameters by treatment/mutation
+## Growth parameters by treatment and mutation
 
 ```{r}
 png("plots/growth_by_tremu.png", height = 480 * 0.8, width = 3*(480 * 0.8))
@@ -170,7 +177,7 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_tremu.png)
 
-## Models of growth parameters by mutation
+# Models of growth parameters by mutation
 
 ```{r}
 png("plots/growth_by_mu.png", height = 480 * 0.8, width = 3 * (480 * 0.8))
@@ -203,9 +210,9 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu_plus_tre.png)
 
-# Model summaries
+## Model summaries
 
-## `vmax ~ mutation`
+### `vmax ~ mutation`
 
 ```{r}
 lme(vmax ~ mutation, random = ~1|line, data = groMU, method = "REML") %>% summary
@@ -252,7 +259,7 @@ lme model parameter contrast
 1 -0.400863 0.1485144 -0.698373 -0.103353 -2.7 56   0.0092
 ```
 
-## `lag ~ mutation`
+### `lag ~ mutation`
 
 ```{r}
 lme(lag ~ mutation, random = ~1|line, data = groMU, method = "REML") %>% summary
@@ -297,7 +304,7 @@ lme model parameter contrast
 1 -8.443423 9.102907 -26.67874 9.79189 -0.93 56   0.3576
 ```
 
-## `final_OD ~ mutation`
+### `final_OD ~ mutation`
 
 ```{r}
 lme(final_OD ~ mutation, random = ~1|line, data = groMU, method = "REML") %>% summary

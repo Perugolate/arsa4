@@ -118,11 +118,14 @@ dev.off()
 ```r
 png("plots/growth_by_mu_plus_tre.png", height = 480 * 0.8, width = 3*(480 * 0.8))
 gvmax <- ggplot(groMU, aes(x = mutation, y = vmax, color = treatment)) + 
-  geom_point(size = 5, position=position_dodge(width = 0.5))
+  geom_point(size = 5, position=position_dodge(width = 0.5)) +
+  ylab(expression(V["max"]))
 glag <- ggplot(groMU, aes(x = mutation, y = lag, color = treatment)) + 
-  geom_point(size = 5, position=position_dodge(width = 0.5))
+  geom_point(size = 5, position=position_dodge(width = 0.5)) +
+  ylab("lag phase (minutes)")
 glod <- ggplot(groMU, aes(x = mutation, y = final_OD, color = treatment)) + 
-  geom_point(size = 5, position=position_dodge(width = 0.5))
+  geom_point(size = 5, position=position_dodge(width = 0.5)) +
+  ylab(expression(paste("final ", "OD"["600"], sep = " ")))
 plot_grid(gvmax, glag, glod, nrow = 1)
 dev.off()
 ```

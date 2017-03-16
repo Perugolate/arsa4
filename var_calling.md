@@ -4,9 +4,9 @@
 - [Get data, do QC](#get-data-do-qc)
 - [Prepare reference](#prepare-reference)
 - [Call SNPs](#call-snps)
- * [Call SNPs with `freebayes` using `snippy`
+  - [Call SNPs with `freebayes` using `snippy`
 ](#call-snps-with-freebayes-using-snippy)
- * [Call variants with `breseq`](#call-variants-with-breseq)
+  - [Call variants with `breseq`](#call-variants-with-breseq)
 - [CNV analysis](#cnv-analysis)
 
 ## Dependencies

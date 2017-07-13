@@ -6,6 +6,7 @@
   - [Growth parameters by treatment and mutation](#growth-parameters-by-treatment-and-mutation)
 - [Models of growth parameters by mutation](#models-of-growth-parameters-by-mutation)
   - [Model summaries](#model-summaries)
+- [rpo](#rpo)
 
 # Dependencies
 ```r
@@ -347,5 +348,158 @@ lme model parameter contrast
      Contrast       S.E.      Lower       Upper     t df Pr(>|t|)
 1 -0.09647773 0.02875101 -0.1540729 -0.03888253 -3.36 56   0.0014
 ```
+```r
+barfoo <- data.frame(dplyr::select(foobar, type, line, Tenecin1, `Tenecin1/Tenecin2`, Pexiganan, Colistin, Melittin, Vancomycin), ytr = rowSums(select(foobar, ytrA, ytrB)), gra = rowSums(select(foobar, graS, graR)))
+```
 
+### rpo
+
+```r
+none <- filter(gro_mu_rpo, ytr == 0 & rpo == 0 & gra == 0)
+gra  <- filter(gro_mu_rpo, gra == 1 & rpo == 0)
+gra_rpo <- filter(gro_mu_rpo, gra == 1 & rpo == 1)
+ytr  <- filter(gro_mu_rpo, ytr == 1 & rpo == 0)
+ytr_rpo <- filter(gro_mu_rpo, ytr == 1 & rpo == 1)
+none$mutation <- "none"
+gra_rpo$mutation <- "gra & rpo"
+gra$mutation <- "gra"
+ytr_rpo$mutation <- "ytr & rpo"
+ytr$mutation <- "ytr"
+groMU_rpo <- rbind(none, gra, gra_rpo, ytr, ytr_rpo) %>%
+  select(vmax, lag, final_OD, treatment, line, mutation)
+groMU_rpo$mutation <- as.factor(groMU_rpo$mutation)
+groMU_rpo$mutation <- relevel(groMU_rpo$mutation, ref = "none")
+```
+
+```r
+par(mfrow = c(1,3), cex = 1.2)
+glm(vmax ~ mutation + line, data=groMU_rpo, family = gaussian) %>%
+  visreg("mutation", main = expression(V["max"]), ylab = expression(V["max"]))
+glm(lag ~ mutation + line, data=groMU_rpo, family = gaussian) %>%
+  visreg("mutation", main = "lag phase", ylab = "lag phase (minutes)")
+glm(final_OD ~ mutation + line, data=groMU_rpo, family = gaussian) %>%
+  visreg("mutation", main = "final OD", ylab = expression(paste("final ", "OD"["600"])))
+```
+
+
+
+```r
+lme(vmax ~ mutation, random = ~1|line, data = groMU_rpo, method = "REML") %>% summary
+```
+
+```
+Linear mixed-effects model fit by REML
+ Data: groMU_rpo
+      AIC      BIC   logLik
+  87.3822 101.5597 -36.6911
+
+Random effects:
+ Formula: ~1 | line
+        (Intercept)  Residual
+StdDev:   0.1555248 0.4072202
+
+Fixed effects: vmax ~ mutation
+                      Value Std.Error DF   t-value p-value
+(Intercept)        3.945417 0.1260667 52 31.296268   0e+00
+mutationgra       -1.249724 0.2052757 52 -6.088028   0e+00
+mutationgra & rpo -1.260474 0.1989745 52 -6.334850   0e+00
+mutationytr       -0.907158 0.1419019 52 -6.392853   0e+00
+mutationytr & rpo -0.694858 0.1909993 52 -3.638015   6e-04
+ Correlation:
+                  (Intr) mttngr mttng&r mttnyt
+mutationgra       -0.427
+mutationgra & rpo -0.441  0.188
+mutationytr       -0.618  0.367  0.272
+mutationytr & rpo -0.459  0.314  0.202   0.419
+
+Standardized Within-Group Residuals:
+       Min         Q1        Med         Q3        Max
+-2.4797299 -0.6542160  0.1423175  0.6794962  1.6269536
+
+Number of Observations: 61
+Number of Groups: 5
+```
+
+```r
+lme(lag  ~ mutation, random = ~1|line, data = groMU_rpo, method = "REML") %>% summary
+```
+
+```
+Linear mixed-effects model fit by REML
+ Data: groMU_rpo
+       AIC      BIC    logLik
+  523.1445 537.3219 -254.5722
+
+Random effects:
+ Formula: ~1 | line
+        (Intercept) Residual
+StdDev:    13.30784 19.39238
+
+Fixed effects: lag ~ mutation
+                     Value Std.Error DF   t-value p-value
+(Intercept)       66.42632  7.777577 52  8.540748   0e+00
+mutationgra       36.08222  9.991113 52  3.611432   7e-04
+mutationgra & rpo 95.18409 10.861808 52  8.763191   0e+00
+mutationytr       71.19967  6.934827 52 10.266972   0e+00
+mutationytr & rpo 53.39249  9.231609 52  5.783660   0e+00
+ Correlation:
+                  (Intr) mttngr mttng&r mttnyt
+mutationgra       -0.323
+mutationgra & rpo -0.297  0.096
+mutationytr       -0.465  0.359  0.138
+mutationytr & rpo -0.349  0.326  0.104   0.422
+
+Standardized Within-Group Residuals:
+        Min          Q1         Med          Q3         Max
+-2.19811045 -0.43729470  0.01331212  0.34808330  3.25431010
+
+Number of Observations: 61
+Number of Groups: 5
+```
+
+```r
+lme(final_OD ~ mutation, random = ~1|line, data = groMU_rpo, method = "REML") %>% summary
+```
+
+```
+Linear mixed-effects model fit by REML
+ Data: groMU_rpo
+        AIC       BIC   logLik
+  -103.0043 -88.82681 58.50214
+
+Random effects:
+ Formula: ~1 | line
+        (Intercept)  Residual
+StdDev:  0.04293953 0.0729799
+
+Fixed effects: final_OD ~ mutation
+                       Value  Std.Error DF  t-value p-value
+(Intercept)        1.0390958 0.02690412 52 38.62218  0.0000
+mutationgra       -0.1056938 0.03740812 52 -2.82542  0.0067
+mutationgra & rpo -0.0707806 0.03953266 52 -1.79043  0.0792
+mutationytr       -0.0041586 0.02592932 52 -0.16038  0.8732
+mutationytr & rpo  0.0238430 0.03461320 52  0.68884  0.4940
+ Correlation:
+                  (Intr) mttngr mttng&r mttnyt
+mutationgra       -0.353
+mutationgra & rpo -0.334  0.118
+mutationytr       -0.509  0.360  0.170
+mutationytr & rpo -0.381  0.323  0.127   0.421
+
+Standardized Within-Group Residuals:
+        Min          Q1         Med          Q3         Max
+-2.34271701 -0.55370167  0.03251352  0.68380138  2.52420073
+
+Number of Observations: 61
+Number of Groups: 5
+```
+
+```
+vmax_lme_rpo <- lme(vmax ~ mutation, random = ~1|line, data = groMU_rpo, method = "REML")
+contrast(vmax_lme_rpo, list(mutation = "ytr"), list(mutation = "ytr & rpo"))
+lag_lme_rpo  <- lme(lag  ~ mutation, random = ~1|line, data = groMU_rpo, method = "REML")
+contrast(vmax_lme_rpo, list(mutation = "ytr"), list(mutation = "ytr & rpo"))
+fod_lme_rpo  <- lme(final_OD ~ mutation, random = ~1|line, data = groMU_rpo, method = "REML")
+contrast(fod_lme_rpo, list(mutation = "ytr"), list(mutation = "ytr & rpo"))
+```
 

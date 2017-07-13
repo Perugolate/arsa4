@@ -381,7 +381,7 @@ glm(final_OD ~ mutation + line, data=groMU_rpo, family = gaussian) %>%
   visreg("mutation", main = "final OD", ylab = expression(paste("final ", "OD"["600"])))
 ```
 
-
+![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_rpo.png)
 
 ```r
 lme(vmax ~ mutation, random = ~1|line, data = groMU_rpo, method = "REML") %>% summary

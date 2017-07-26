@@ -5,7 +5,7 @@
   - [Growth parameters by treatment](#growth-parameters-by-treatment)
   - [Growth parameters by treatment and mutation](#growth-parameters-by-treatment-and-mutation)
 - [Models of growth parameters by mutation](#models-of-growth-parameters-by-mutation)
-  - [Model summaries](#model-summaries)
+  - [Models and contrasts](#models-and-contrasts)
 - [rpo](#rpo)
 
 # Dependencies
@@ -211,7 +211,7 @@ dev.off()
 
 ![](https://github.com/Perugolate/arsa4/blob/master/plots/growth_by_mu_plus_tre.png)
 
-## Model summaries
+## Model and contrasts
 
 ### `vmax ~ mutation`
 
@@ -355,6 +355,11 @@ barfoo <- data.frame(dplyr::select(foobar, type, line, Tenecin1, `Tenecin1/Tenec
 ### rpo
 
 ```r
+odf8 <- data.frame(dplyr::select(odf4, ID, treatment, line),
+  ytr = rowSums(select(odf4, ytrA, ytrB)),
+  gra = rowSums(select(odf4, graS, graR)),
+  rpo = rowSums(select(odf4, rpoB, rpoC)))
+gro_mu_rpo <- left_join(by_id, odf8)
 none <- filter(gro_mu_rpo, ytr == 0 & rpo == 0 & gra == 0)
 gra  <- filter(gro_mu_rpo, gra == 1 & rpo == 0)
 gra_rpo <- filter(gro_mu_rpo, gra == 1 & rpo == 1)
@@ -503,3 +508,25 @@ fod_lme_rpo  <- lme(final_OD ~ mutation, random = ~1|line, data = groMU_rpo, met
 contrast(fod_lme_rpo, list(mutation = "ytr"), list(mutation = "ytr & rpo"))
 ```
 
+# Jaccard
+
+## Permutational Multivariate Analysis of Variance 
+
+```r
+adonis(mu ~ treatment, data = mu.env, method = "jaccard")
+```
+
+```
+Call:
+adonis(formula = mu ~ treatment, data = mu.env, method = "jaccard")
+
+Permutation: free
+Number of permutations: 999
+
+Terms added sequentially (first to last)
+
+          Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)
+treatment  1    0.3929 0.39294   1.063 0.11729  0.363
+Residuals  8    2.9574 0.36967         0.88271
+Total      9    3.3503                 1.00000
+```
